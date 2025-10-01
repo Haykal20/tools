@@ -20,12 +20,17 @@
     <!-- JS for TikTok Downloader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- JS for Tensor AI Detector -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
 
     <style>
         /* General Body Style */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0f172a; /* Slate 900 */
+            touch-action: manipulation;
         }
         
         /* Custom Scrollbar for AI Chat */
@@ -101,6 +106,20 @@
         @keyframes fadeIn {
             to { opacity: 1; }
         }
+
+        /* Tensor AI Detector Styles */
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-gray-200 antialiased">
@@ -114,7 +133,7 @@
                 <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">Haykal AIO Tools</h1>
                 <p class="text-slate-400 mt-3 text-lg">Pilih alat yang ingin Anda gunakan di bawah ini.</p>
             </header>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
                 <!-- AI Chat Card -->
                 <div id="select-ai-chat" class="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:bg-slate-700/50 hover:border-teal-500 transition-all duration-300 cursor-pointer flex flex-col items-center text-center transform hover:-translate-y-2">
                     <div class="bg-teal-500/10 p-4 rounded-full mb-4 border border-teal-500/20"><i data-lucide="bot" class="w-10 h-10 text-teal-400"></i></div>
@@ -126,6 +145,12 @@
                     <div class="bg-purple-500/10 p-4 rounded-full mb-4 border border-purple-500/20"><i class="fab fa-tiktok w-10 h-10 text-purple-400 text-4xl"></i></div>
                     <h2 class="text-2xl font-bold text-white mb-2">TikTok Downloader</h2>
                     <p class="text-slate-400">Unduh video & slideshow dari TikTok.</p>
+                </div>
+                <!-- Tensor AI Detector Card -->
+                <div id="select-tensor-ai" class="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:bg-slate-700/50 hover:border-amber-500 transition-all duration-300 cursor-pointer flex flex-col items-center text-center transform hover:-translate-y-2">
+                    <div class="bg-amber-500/10 p-4 rounded-full mb-4 border border-amber-500/20"><i data-lucide="scan-line" class="w-10 h-10 text-amber-400"></i></div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Detektor Objek AI</h2>
+                    <p class="text-slate-400">Deteksi objek real-time dengan kamera.</p>
                 </div>
                 <!-- Number Converter Card -->
                 <div id="select-num-converter" class="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:bg-slate-700/50 hover:border-sky-500 transition-all duration-300 cursor-pointer flex flex-col items-center text-center transform hover:-translate-y-2">
@@ -202,7 +227,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- ===== TIKTOK DOWNLOADER TOOL VIEW ===== -->
         <div id="tiktok-tool-view" class="hidden min-h-screen tiktok-tool-body p-4">
@@ -295,7 +319,6 @@
             </div>
         </div>
 
-
         <!-- ===== PASSWORD GENERATOR TOOL VIEW ===== -->
         <div id="pw-generator-view" class="hidden min-h-screen tool-body p-4 flex items-center justify-center">
             <div class="w-full max-w-2xl mx-auto">
@@ -337,6 +360,41 @@
                 </div>
             </div>
         </div>
+
+        <!-- ===== TENSOR AI DETECTOR TOOL VIEW ===== -->
+        <div id="tensor-tool-view" class="hidden flex-col h-screen p-4 bg-gray-900 text-white">
+            <div class="w-full max-w-2xl mx-auto h-full flex flex-col">
+                 <button class="back-to-selection-btn mb-4 flex items-center gap-2 text-slate-300 hover:text-white transition self-start">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
+                </button>
+                <!-- Header -->
+                <header class="text-center mb-4">
+                    <h1 class="text-2xl font-bold">Detektor Objek AI</h1>
+                    <p id="tensor-status" class="text-sm text-gray-400">Klik tombol untuk memulai</p>
+                </header>
+
+                <!-- Camera Container -->
+                <div class="flex-grow bg-black shadow-2xl rounded-2xl relative overflow-hidden flex items-center justify-center">
+                    <!-- Video feed from camera -->
+                    <video id="cameraFeed" playsinline autoplay muted class="absolute top-0 left-0 w-full h-full object-cover"></video>
+                    <!-- Canvas for drawing detection results -->
+                    <canvas id="canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                    
+                    <!-- Start UI and Loading -->
+                    <div id="start-ui" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10">
+                        <button id="startButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg transition-transform duration-200 active:scale-95">
+                            Mulai Deteksi
+                        </button>
+                        <div id="loading" class="hidden flex-col items-center">
+                            <div class="loader mb-4"></div>
+                            <p>Memuat model AI, mohon tunggu...</p>
+                        </div>
+                         <p id="tensor-error-message" class="hidden mt-4 text-red-400 bg-red-900/50 p-3 rounded-lg"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -346,13 +404,15 @@
             aiChat: document.getElementById('ai-tool-view'),
             tiktok: document.getElementById('tiktok-tool-view'),
             numConverter: document.getElementById('num-converter-view'),
-            pwGenerator: document.getElementById('pw-generator-view')
+            pwGenerator: document.getElementById('pw-generator-view'),
+            tensor: document.getElementById('tensor-tool-view')
         };
         const buttons = {
             selectAiChat: document.getElementById('select-ai-chat'),
             selectTikTok: document.getElementById('select-tiktok-dl'),
             selectNumConverter: document.getElementById('select-num-converter'),
             selectPwGenerator: document.getElementById('select-pw-generator'),
+            selectTensor: document.getElementById('select-tensor-ai'),
             back: document.querySelectorAll('.back-to-selection-btn')
         };
         function showView(viewToShow) {
@@ -366,18 +426,15 @@
         buttons.selectTikTok.addEventListener('click', () => showView(views.tiktok));
         buttons.selectNumConverter.addEventListener('click', () => showView(views.numConverter));
         buttons.selectPwGenerator.addEventListener('click', () => showView(views.pwGenerator));
+        buttons.selectTensor.addEventListener('click', () => showView(views.tensor));
         buttons.back.forEach(btn => btn.addEventListener('click', () => showView(views.selection)));
 
         // --- INITIALIZE ICONS ---
         lucide.createIcons();
 
-                // --- AI CHAT SCRIPT ---
+        // --- AI CHAT SCRIPT ---
         (() => {
-            // URL sudah benar menunjuk ke Worker Anda
             const API_URL = "https://restless-fire-59dc.thehaykal219.workers.dev";
-            
-            // TIDAK ADA API_KEYS DI SINI (SUDAH AMAN DI CLOUDFLARE)
-            
             const chatContainer = document.getElementById('chat-container');
             const chatForm = document.getElementById('chat-form');
             const userInput = document.getElementById('user-input');
@@ -439,21 +496,12 @@
                     setFormDisabled(false);
                 }
             }
-
-            // ===== BAGIAN INI YANG DIPERBAIKI SECARA TOTAL =====
             async function getAIResponse(model) {
-                // Kita tidak perlu lagi mencari API Key di sini.
-                // Kita langsung mengirim permintaan ke Worker kita.
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 
-                        // Tidak ada lagi header 'Authorization', karena API Key dihandle oleh Worker
-                        'Content-Type': 'application/json' 
-                    },
-                    // Kita hanya mengirim model dan messages
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ model, messages })
                 });
-
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(`API Error: ${response.status} - ${errorData.error}`);
@@ -461,8 +509,6 @@
                 const data = await response.json();
                 return data.choices[0].message.content;
             }
-            // ======================================================
-
             function appendMessage(sender, text, isError = false) {
                 const msgWrapper = document.createElement('div'), msgContent = document.createElement('div'), iconDiv = document.createElement('div');
                 iconDiv.className = 'bg-gray-700 p-2 rounded-full self-start';
@@ -501,42 +547,35 @@
                 userInput.placeholder = isDisabled ? "AI sedang berpikir..." : "Ketik pesan Anda di sini...";
                 if (!isDisabled) userInput.focus();
             }
-        })(); // <-- Kurung kurawal yang salah tempat sekarang sudah ada di posisi yang benar
-
+        })();
 
         // --- TIKTOK DOWNLOADER SCRIPT ---
         (() => {
             let currentSlides = [];
             let currentCaption = "";
-
             window.hideAllResultSections = function() {
                 document.getElementById('tiktok-result').classList.remove('visible');
                 ['captionSection', 'videoSection', 'slideshowSection', 'profileSection', 'tiktok-error'].forEach(id => document.getElementById(id).classList.add('hidden'));
             }
-
             window.pasteFromClipboard = async function() {
                 try {
                     document.getElementById('tiktok-url').value = await navigator.clipboard.readText();
                     toggleClearButton();
                 } catch (err) { console.error('Gagal membaca clipboard: ', err); }
             }
-
             window.toggleClearButton = function() {
                 document.getElementById('clear-btn').classList.toggle('hidden', !document.getElementById('tiktok-url').value);
             }
-            
             window.clearInput = function() {
                 document.getElementById('tiktok-url').value = '';
                 toggleClearButton();
             }
-
             window.downloadTikTok = async function() {
                 const urlInput = document.getElementById('tiktok-url').value.trim();
                 let url = urlInput.startsWith('@') ? `https://www.tiktok.com/${urlInput}` : urlInput;
                 const loading = document.getElementById('tiktok-loading');
                 const error = document.getElementById('tiktok-error');
                 const errorMessage = document.getElementById('errorMessage');
-
                 if (!url) { errorMessage.textContent = 'Tolong masukkan URL TikTok!'; error.classList.remove('hidden'); return; }
                 hideAllResultSections();
                 loading.classList.remove('hidden');
@@ -586,7 +625,6 @@
                     loading.classList.add('hidden');
                 }
             }
-
             window.copyCaption = function() {
                 navigator.clipboard.writeText(currentCaption).then(() => {
                     const btnText = document.getElementById('copyBtnText');
@@ -594,11 +632,9 @@
                     setTimeout(() => { btnText.textContent = 'Salin Caption'; }, 2000);
                 });
             }
-
             const createVideoHTML = () => `<div class="bg-green-500/20 rounded-lg p-4 border border-green-400/30"><h3 class="text-green-100 font-semibold mb-4 flex items-center gap-2"><i class="fas fa-video"></i> Video Terdeteksi</h3><video id="preview" controls class="video-preview-large mb-4"></video><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><a id="videoLink" download href="#" target="_blank" class="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-medium py-3 px-4 rounded-lg"><i class="fas fa-video"></i> Unduh Video</a><a id="audioLink" download href="#" target="_blank" class="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-medium py-3 px-4 rounded-lg"><i class="fas fa-music"></i> Unduh Audio</a></div></div>`;
             const createSlideshowHTML = () => `<div class="bg-yellow-500/20 rounded-lg p-4 border border-yellow-400/30"><h3 class="text-yellow-100 font-semibold mb-4 flex items-center gap-2"><i class="fas fa-images"></i> Slideshow Terdeteksi</h3><div class="mb-6"><img id="slidePreviewLarge" alt="Slide Preview" class="slide-preview-large mx-auto"><div class="flex justify-center mt-3"><span id="currentSlideInfo" class="text-yellow-200 text-sm"></span></div></div><div class="slide-container" id="slidesContainer"></div><div class="mt-4"><button onclick="downloadSlidesAsZip()" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-file-archive mr-2"></i> Unduh Semua (ZIP)</button></div></div>`;
             const createProfileHTML = () => `<div class="bg-indigo-500/20 rounded-lg p-4 border border-indigo-400/30"><h3 class="text-indigo-100 font-semibold mb-3 flex items-center gap-2"><i class="fas fa-user-circle"></i> Informasi Profil</h3><div class="flex items-center gap-4 mb-4"><img id="profileImage" alt="Profile" class="w-24 h-24 rounded-full border-4 border-white shadow-xl"><div class="min-w-0"><p id="username" class="text-white font-bold text-xl break-words"></p><p id="nickname" class="text-indigo-200 text-sm break-words"></p><p id="followers" class="text-indigo-300 text-xs mt-1"></p></div></div><a id="profileDownloadLink" download href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold py-3 px-6 rounded-lg"><i class="fas fa-user"></i> Unduh Foto Profil</a></div>`;
-
             const displayVideo = (video) => { document.getElementById('preview').src = video.play; document.getElementById('videoLink').href = video.play; const audioLink = document.getElementById('audioLink'); audioLink.href = video.music; audioLink.classList.toggle('hidden', !video.music); }
             const displaySlideshow = (slideshow) => {
                 currentSlides = slideshow.images || [];
@@ -673,12 +709,9 @@
             };
             const clearBtn = document.getElementById('clear-converter-btn');
             let activeInput = null;
-
             const updateAll = (source, value) => {
                 if (activeInput !== source) return;
-                
                 let textVal = '', decVal = '', binVal = '', hexVal = '', octVal = '';
-
                 if (source === 'text') {
                     if(value) {
                        for (const char of value) {
@@ -690,26 +723,21 @@
                         }
                     }
                     textVal = value;
-                } else { // Source is a number field
+                } else {
                     const cleanedValue = value.replace(/\s+/g, '');
                     if(cleanedValue) {
                         const baseMap = { dec: 10, bin: 2, hex: 16, oct: 8 };
                         const numbers = cleanedValue.match(/[0-9a-fA-F]+/g) || [];
-                        
                         try {
                            const decValues = numbers.map(numStr => parseInt(numStr, baseMap[source]));
                            if (decValues.some(isNaN)) throw new Error("Invalid number");
-
                             decValues.forEach(dec => {
-                                if (dec >= 0 && dec <= 0x10FFFF) { // Check if it's a valid Unicode character
-                                   textVal += String.fromCodePoint(dec);
-                                }
+                                if (dec >= 0 && dec <= 0x10FFFF) { textVal += String.fromCodePoint(dec); }
                                 decVal += dec + ' ';
                                 binVal += dec.toString(2).padStart(8, '0') + ' ';
                                 hexVal += dec.toString(16).toUpperCase().padStart(2, '0') + ' ';
                                 octVal += dec.toString(8).padStart(3, '0') + ' ';
                             });
-
                         } catch (e) {
                              Object.keys(inputs).forEach(key => { if(key !== source && key !== 'text') inputs[key].value = ''; });
                              inputs.text.value = 'Error';
@@ -717,24 +745,19 @@
                         }
                     }
                 }
-                
-                // Update fields that were not the source
                 if (source !== 'text') inputs.text.value = textVal.trim();
                 if (source !== 'dec') inputs.dec.value = decVal.trim();
                 if (source !== 'bin') inputs.bin.value = binVal.trim();
                 if (source !== 'hex') inputs.hex.value = hexVal.trim();
                 if (source !== 'oct') inputs.oct.value = octVal.trim();
             };
-            
             Object.entries(inputs).forEach(([name, element]) => {
                 element.addEventListener('focus', () => activeInput = name);
                 element.addEventListener('input', (e) => updateAll(name, e.target.value));
             });
-
             clearBtn.addEventListener('click', () => {
                 Object.values(inputs).forEach(input => input.value = '');
             });
-
         })();
 
         // --- PASSWORD GENERATOR SCRIPT ---
@@ -772,6 +795,175 @@
             copyBtn.addEventListener('click', copyPassword);
             buttons.selectPwGenerator.addEventListener('click', generatePassword);
         })();
+
+        // --- TENSOR AI DETECTOR SCRIPT ---
+        (() => {
+            const tensorView = document.getElementById('tensor-tool-view');
+            if (!tensorView) return;
+
+            const video = tensorView.querySelector('#cameraFeed');
+            const canvas = tensorView.querySelector('#canvas');
+            const context = canvas.getContext('2d');
+            const startButton = tensorView.querySelector('#startButton');
+            const startUI = tensorView.querySelector('#start-ui');
+            const loadingUI = tensorView.querySelector('#loading');
+            const statusText = tensorView.querySelector('#tensor-status');
+            const errorMessage = tensorView.querySelector('#tensor-error-message');
+            const backButton = tensorView.querySelector('.back-to-selection-btn');
+            
+            let model = null;
+            let lastSpoken = '';
+            let speakTimeout = null;
+            let stream = null;
+            let animationFrameId = null;
+
+            const kamusIndonesia = {
+                person: 'orang', bicycle: 'sepeda', car: 'mobil', motorcycle: 'sepeda motor',
+                airplane: 'pesawat', bus: 'bis', train: 'kereta', truck: 'truk', boat: 'perahu',
+                'traffic light': 'lampu lalu lintas', 'fire hydrant': 'hidran', 'stop sign': 'rambu berhenti',
+                'parking meter': 'meteran parkir', bench: 'bangku', bird: 'burung', cat: 'kucing',
+                dog: 'anjing', horse: 'kuda', sheep: 'domba', cow: 'sapi', elephant: 'gajah',
+                bear: 'beruang', zebra: 'zebra', giraffe: 'jerapah', backpack: 'ransel',
+                umbrella: 'payung', handbag: 'tas tangan', tie: 'dasi', suitcase: 'koper',
+                frisbee: 'frisbee', skis: 'ski', snowboard: 'papan seluncur', 'sports ball': 'bola',
+                kite: 'layang-layang', 'baseball bat': 'tongkat bisbol', 'baseball glove': 'sarung tangan bisbol',
+                skateboard: 'papan luncur', surfboard: 'papan selancar', 'tennis racket': 'raket tenis',
+                bottle: 'botol', 'wine glass': 'gelas anggur', cup: 'gelas', fork: 'garpu',
+                knife: 'pisau', spoon: 'sendok', bowl: 'mangkuk', banana: 'pisang', apple: 'apel',
+                sandwich: 'roti lapis', orange: 'jeruk', broccoli: 'brokoli', carrot: 'wortel',
+                'hot dog': 'hot dog', pizza: 'pizza', donut: 'donat', cake: 'kue', chair: 'kursi',
+                couch: 'sofa', 'potted plant': 'tanaman pot', bed: 'tempat tidur', 'dining table': 'meja makan',
+                toilet: 'toilet', tv: 'televisi', laptop: 'laptop', mouse: 'mouse', remote: 'remote',
+                keyboard: 'keyboard', 'cell phone': 'ponsel', microwave: 'microwave', oven: 'oven',
+                toaster: 'pemanggang roti', sink: 'wastafel', refrigerator: 'kulkas', book: 'buku',
+                clock: 'jam', vase: 'vas', scissors: 'gunting', 'teddy bear': 'boneka beruang',
+                'hair drier': 'pengering rambut', toothbrush: 'sikat gigi'
+            };
+            
+            function stopDetection() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+                window.speechSynthesis.cancel();
+                startUI.classList.remove('hidden');
+                startButton.classList.remove('hidden');
+                loadingUI.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                statusText.textContent = "Klik tombol untuk memulai";
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                video.srcObject = null;
+            }
+
+            backButton.addEventListener('click', stopDetection);
+            
+            function speak(text) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+            
+            async function runDetection() {
+                if (!model || !stream || !video.srcObject) return;
+                const predictions = await model.detect(video);
+                
+                const aspectRatio = video.videoWidth / video.videoHeight;
+                let canvasWidth, canvasHeight;
+
+                if (canvas.parentElement.clientWidth / canvas.parentElement.clientHeight > aspectRatio) {
+                    canvasWidth = canvas.parentElement.clientHeight * aspectRatio;
+                    canvasHeight = canvas.parentElement.clientHeight;
+                } else {
+                    canvasWidth = canvas.parentElement.clientWidth;
+                    canvasHeight = canvas.parentElement.clientWidth / aspectRatio;
+                }
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.font = '16px Inter';
+                context.textBaseline = 'top';
+
+                predictions.forEach(prediction => {
+                    const [x, y, width, height] = prediction.bbox.map(val => val * (canvas.width / video.videoWidth));
+                    const translatedClass = kamusIndonesia[prediction.class] || prediction.class;
+                    const score = Math.round(prediction.score * 100);
+
+                    context.strokeStyle = '#00FFFF';
+                    context.lineWidth = 2;
+                    context.strokeRect(x, y, width, height);
+
+                    context.fillStyle = '#00FFFF';
+                    const text = `${translatedClass} (${score}%)`;
+                    const textWidth = context.measureText(text).width;
+                    context.fillRect(x, y, textWidth + 8, 24);
+                    
+                    context.fillStyle = '#000000';
+                    context.fillText(text, x + 4, y + 4);
+                });
+
+                if (predictions.length > 0) {
+                    const topPrediction = predictions.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+                    const translatedClass = kamusIndonesia[topPrediction.class] || topPrediction.class;
+
+                    if (topPrediction.score > 0.65 && translatedClass !== lastSpoken) {
+                        lastSpoken = translatedClass;
+                        clearTimeout(speakTimeout);
+                        speakTimeout = setTimeout(() => {
+                            speak(`Ini ${translatedClass}`);
+                        }, 500);
+                    }
+                } else {
+                    lastSpoken = '';
+                }
+
+                animationFrameId = requestAnimationFrame(runDetection);
+            }
+            
+            startButton.addEventListener('click', async () => {
+                startButton.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                loadingUI.classList.remove('hidden');
+                statusText.textContent = "Memuat model AI...";
+
+                try {
+                    if (!model) {
+                       model = await cocoSsd.load();
+                    }
+                    statusText.textContent = "Mengaktifkan kamera...";
+                    
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    });
+                    video.srcObject = stream;
+
+                    video.onloadedmetadata = () => {
+                        startUI.classList.add('hidden');
+                        statusText.textContent = "Arahkan kamera ke objek";
+                        runDetection();
+                    };
+
+                } catch (err) {
+                    console.error("Error:", err);
+                    statusText.textContent = "Gagal memuat. Coba lagi.";
+                    errorMessage.textContent = "Gagal memulai kamera/model. Pastikan Anda memberi izin kamera & menggunakan koneksi HTTPS.";
+                    errorMessage.classList.remove('hidden');
+                    startButton.classList.remove('hidden');
+                    loadingUI.classList.add('hidden');
+                }
+            });
+        })();
+
     </script>
 </body>
 </html>
