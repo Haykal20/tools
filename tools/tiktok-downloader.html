@@ -1,0 +1,43 @@
+<div id="tiktok-tool-view" class="min-h-screen tiktok-tool-body p-4">
+     <div class="w-full max-w-4xl mx-auto">
+        <button class="back-to-selection-btn mb-4 flex items-center gap-2 text-purple-200 hover:text-white transition">
+            <i class="fas fa-arrow-left"></i> Kembali ke Menu
+        </button>
+        <div class="glass-card rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-pink-500 to-purple-600 p-6 text-white text-center">
+                <div class="flex items-center justify-center gap-3 mb-2"><i class="fas fa-magic text-2xl"></i><h1 class="text-3xl font-bold">TikTok Downloader Pro</h1></div>
+                <p class="text-purple-100">Auto-Detect • Caption Saver • History by Haykalf.s</p>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <label class="block text-white font-medium mb-2"><i class="fas fa-link"></i> TikTok URL</label>
+                    <div class="relative flex items-center">
+                        <input type="text" id="tiktok-url" placeholder="Tempel link TikTok di sini..." oninput="toggleClearButton()" class="w-full pl-4 pr-20 py-3 rounded-lg border-2 border-purple-300 focus:border-pink-500 focus:outline-none transition-colors bg-white/20 text-white placeholder-purple-200"/>
+                        <div class="absolute right-2 flex items-center space-x-1">
+                            <button id="clear-btn" onclick="clearInput()" class="hidden text-white/50 hover:text-white transition-colors p-1 rounded-full"><i class="fas fa-times"></i></button>
+                            <button onclick="pasteFromClipboard()" class="bg-pink-500/50 hover:bg-pink-500 text-white font-semibold text-xs px-2 py-1 rounded-md transition-colors">Tempel</button>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="downloadTikTok()" class="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-orange-500 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 pulse">
+                    <i class="fas fa-download mr-2"></i><span>Download</span>
+                </button>
+                <div id="tiktok-loading" class="hidden mt-6 p-4 bg-blue-500/20 rounded-lg"><div class="flex items-center justify-center gap-3 text-blue-100"><i class="fas fa-spinner animate-spin"></i><span id="loadingText">Menganalisis URL...</span></div></div>
+                <div id="tiktok-error" class="hidden mt-6 p-4 bg-red-500/20 rounded-lg"><div class="flex items-center gap-2 text-red-100"><i class="fas fa-exclamation-triangle"></i><span id="errorMessage">Terjadi kesalahan</span></div></div>
+                <div id="tiktok-result" class="mt-6 space-y-6">
+                     <div id="captionSection" class="hidden">
+                        <div class="bg-gray-500/20 rounded-lg p-4 border border-gray-400/30">
+                            <h3 class="text-gray-100 font-semibold mb-2 flex items-center gap-2"><i class="fas fa-quote-left"></i> Caption</h3>
+                            <p id="captionText" class="text-gray-200 text-sm max-h-24 overflow-y-auto mb-3"></p>
+                            <button onclick="copyCaption()" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"><i class="fas fa-copy mr-2"></i><span id="copyBtnText">Salin Caption</span></button>
+                        </div>
+                    </div>
+                    <div id="videoSection" class="hidden"></div>
+                    <div id="slideshowSection" class="hidden"></div>
+                    <div id="profileSection" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+        <div id="historyContainer" class="mt-6"></div>
+    </div>
+</div>

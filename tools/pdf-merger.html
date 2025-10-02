@@ -1,0 +1,31 @@
+<div id="pdf-merger-view" class="min-h-screen tool-body p-4 flex justify-center">
+    <div class="w-full max-w-4xl mx-auto">
+        <button class="back-to-selection-btn mb-4 flex items-center gap-2 text-slate-300 hover:text-white transition">
+           <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
+       </button>
+       <div class="tool-card rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-center">
+               <div class="flex items-center justify-center gap-3 mb-2"><i data-lucide="file-stack" class="w-7 h-7"></i><h1 class="text-3xl font-bold">Penggabung Gambar ke PDF</h1></div>
+               <p class="text-green-100">Upload banyak gambar, atur urutan, lalu gabung jadi 1 PDF!</p>
+           </div>
+           <div class="p-6">
+                <div class="drop-area" id="dropArea">
+                    <i data-lucide="upload-cloud" class="icon-lucide"></i>
+                    <p class="font-bold text-lg text-slate-200">Klik atau tarik gambar ke sini</p>
+                    <p class="text-sm text-slate-400 mt-1">Mendukung: JPG, PNG, WEBP, BMP</p>
+                </div>
+        
+                <input type="file" id="fileInput" accept="image/*" multiple />
+                
+                <div id="preview-container"></div>
+                
+                <div id="status" class="font-bold text-center min-h-[24px] my-4"></div>
+
+                <button class="btn" id="convertBtn" onclick="convertToPDF()" disabled>
+                    <i data-lucide="file-check-2" class="inline-block mr-2 w-5 h-5"></i>
+                    Gabung Jadi PDF
+                </button>
+           </div>
+       </div>
+   </div>
+</div>

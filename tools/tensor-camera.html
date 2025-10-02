@@ -1,0 +1,26 @@
+<div id="tensor-camera-view" class="flex-col h-screen p-4 bg-gray-900 text-white">
+    <div class="w-full max-w-2xl mx-auto h-full flex flex-col">
+        <button class="back-to-chooser-btn mb-4 flex items-center gap-2 text-slate-300 hover:text-white transition self-start">
+           <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Pilihan Mode
+       </button>
+       <header class="text-center mb-4">
+           <h1 class="text-2xl font-bold">Deteksi Objek via Kamera</h1>
+           <p id="tensor-status" class="text-sm text-gray-400">Klik tombol untuk memulai</p>
+       </header>
+
+       <div class="flex-grow bg-black shadow-2xl rounded-2xl relative overflow-hidden flex items-center justify-center">
+           <video id="cameraFeed" playsinline autoplay muted class="absolute top-0 left-0 w-full h-full object-cover"></video>
+           <canvas id="canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+           <div id="start-ui" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10">
+               <button id="startButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg transition-transform duration-200 active:scale-95">
+                   Mulai Deteksi
+               </button>
+               <div id="loading" class="hidden flex-col items-center">
+                   <div class="loader mb-4"></div>
+                   <p>Memuat model AI, mohon tunggu...</p>
+               </div>
+                <p id="tensor-error-message" class="hidden mt-4 text-red-400 bg-red-900/50 p-3 rounded-lg"></p>
+           </div>
+       </div>
+   </div>
+</div>
