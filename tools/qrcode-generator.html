@@ -1,0 +1,57 @@
+<div id="qrcode-tool-view" class="min-h-screen tool-body p-4 flex justify-center">
+    <div class="w-full max-w-4xl mx-auto">
+        <button class="back-to-selection-btn mb-4 flex items-center gap-2 text-slate-300 hover:text-white transition">
+           <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
+       </button>
+       <div class="tool-card rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-center">
+               <div class="flex items-center justify-center gap-3 mb-2">
+                    <i data-lucide="qr-code" class="w-7 h-7"></i>
+                    <h1 class="text-3xl font-bold">Generator QR Code</h1>
+                </div>
+               <p class="text-indigo-100">Buat QR code kustom secara instan. Cukup ketik!</p>
+           </div>
+           
+           <div class="p-6 grid md:grid-cols-2 gap-8 md:gap-12">
+      
+                <div class="flex flex-col space-y-6">
+                    <div>
+                        <label for="qrInput" class="block text-sm font-medium text-slate-300 mb-2">Teks atau Link Anda</label>
+                        <textarea id="qrInput" rows="4" class="w-full p-3 bg-slate-900/50 border-2 border-slate-700 rounded-lg text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: https://google.com"></textarea>
+                    </div>
+
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <h3 class="font-semibold text-slate-100 mb-3">Kustomisasi Warna</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="colorDots" class="block text-sm font-medium text-slate-400">Warna Titik</label>
+                                <input type="color" id="colorDots" value="#FFFFFF" class="w-full h-10 p-1 bg-slate-700 border border-slate-600 rounded-md cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="colorBg" class="block text-sm font-medium text-slate-400">Warna Latar</label>
+                                <input type="color" id="colorBg" value="#1E293B" class="w-full h-10 p-1 bg-slate-700 border border-slate-600 rounded-md cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold text-slate-100 mb-3">Unduh Hasil</h3>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button id="downloadPNG" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 disabled:bg-slate-600 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                              <i data-lucide="image" class="w-5 h-5"></i> Unduh PNG
+                            </button>
+                            <button id="downloadPDF" class="w-full bg-rose-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-rose-700 disabled:bg-slate-600 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                              <i data-lucide="file-text" class="w-5 h-5"></i> Unduh PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-slate-900/50 rounded-xl p-6 border border-slate-700">
+                    <div id="qrcode" class="border-4 border-slate-700 shadow-lg rounded-lg overflow-hidden"></div>
+                    <p id="qrPlaceholder" class="text-slate-500">Ketik sesuatu untuk membuat QR Code</p>
+                </div>
+            </div>
+       </div>
+   </div>
+</div>

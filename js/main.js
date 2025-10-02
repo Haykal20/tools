@@ -42,7 +42,6 @@ async function loadView(viewName) {
                 initPdfMerger();
                 initBackButtonListener();
                 break;
-            // KASUS BARU UNTUK TENSOR
             case 'tensor-chooser':
                 initTensorChooserListeners(); // Inisialisasi untuk halaman pilihan
                 initBackButtonListener();
@@ -53,6 +52,10 @@ async function loadView(viewName) {
                 break;
             case 'tensor-image':
                 initTensorImage(); // Inisialisasi untuk mode gambar
+                initBackButtonListener();
+                break;
+            case 'qrcode-generator':
+                initQrCodeGenerator();
                 initBackButtonListener();
                 break;
         }
@@ -69,6 +72,7 @@ function initToolSelectionListeners() {
     document.getElementById('select-pdf-merger')?.addEventListener('click', () => loadView('pdf-merger'));
     // Mengarahkan ke halaman pilihan tensor
     document.getElementById('select-tensor-ai')?.addEventListener('click', () => loadView('tensor-chooser'));
+    document.getElementById('select-qrcode-generator')?.addEventListener('click', () => loadView('qrcode-generator'));
 }
 
 // FUNGSI BARU UNTUK MENGHANDLE HALAMAN PILIHAN TENSOR
