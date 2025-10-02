@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadView(viewName) {
     try {
-        const response = await fetch(`tools/${viewName}.html`);
+        // gunakan path relatif eksplisit
+        const response = await fetch(`./tools/${viewName}.html`);
         if (!response.ok) throw new Error(`Gagal memuat view: ${viewName}.html`);
         
         const html = await response.text();
@@ -16,55 +17,74 @@ async function loadView(viewName) {
             appContainer.firstElementChild.classList.add('view-enter');
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
-        
-        // Memanggil fungsi inisialisasi yang sesuai
+
+        // helper: panggil fungsi init dengan pengecekan dan retry singkat
+        const callInit = (fnName) => {
+            if (!fnName) return;
+            if (typeof window[fnName] === 'function') {
+                try { window[fnName](); } catch (e) { console.error(`Error saat menjalankan ${fnName}:`, e); }
+            } else {
+                // retry sekali setelah delay kecil (bila script belum sempat dieksekusi)
+                setTimeout(() => {
+                    if (typeof window[fnName] === 'function') {
+                        try { window[fnName](); } catch (e) { console.error(`Error saat menjalankan ${fnName}:`, e); }
+                    } else {
+                        console.warn(`${fnName} tidak ditemukan.`);
+                    }
+                }, 250);
+            }
+        };
+
+        // mapping view -> nama fungsi init (jaga agar tidak crash bila fungsi belum terdefinisi)
         switch (viewName) {
             case 'tool-selection':
-                initToolSelectionListeners();
+                callInit('initToolSelectionListeners');
                 break;
             case 'ai-chat':
-                initAiChat();
-                initBackButtonListener();
+                callInit('initAiChat');
+                callInit('initBackButtonListener');
                 break;
             case 'tiktok-downloader':
-                initTikTokDownloader();
-                initBackButtonListener();
+                callInit('initTikTokDownloader');
+                callInit('initBackButtonListener');
                 break;
             case 'number-converter':
-                initNumberConverter();
-                initBackButtonListener();
+                callInit('initNumberConverter');
+                callInit('initBackButtonListener');
                 break;
             case 'password-generator':
-                initPasswordGenerator();
-                initBackButtonListener();
+                callInit('initPasswordGenerator');
+                callInit('initBackButtonListener');
                 break;
             case 'pdf-merger':
-                initPdfMerger();
-                initBackButtonListener();
+                callInit('initPdfMerger');
+                callInit('initBackButtonListener');
                 break;
             case 'tensor-chooser':
-                initTensorChooserListeners(); // Inisialisasi untuk halaman pilihan
-                initBackButtonListener();
+                callInit('initTensorChooserListeners');
+                callInit('initBackButtonListener');
                 break;
             case 'tensor-camera':
-                initTensorCamera(); // Inisialisasi untuk mode kamera
-                initBackButtonListener();
+                callInit('initTensorCamera');
+                callInit('initBackButtonListener');
                 break;
             case 'tensor-image':
-                initTensorImage(); // Inisialisasi untuk mode gambar
-                initBackButtonListener();
+                callInit('initTensorImage');
+                callInit('initBackButtonListener');
                 break;
             case 'qrcode-generator':
-                initQrCodeGenerator();
-                initBackButtonListener();
+                callInit('initQrCodeGenerator');
+                callInit('initBackButtonListener');
                 break;
             case 'diagram-editor':
-                initDiagramEditor();
-                initBackButtonListener();
+                callInit('initDiagramEditor');
+                callInit('initBackButtonListener');
                 break;
             case 'text-extractor':
-                initTextExtractor();
-                initBackButtonListener();
+                callInit('initTextExtractor');
+                callInit('initBackButtonListener');
+                break;
+            default:
                 break;
         }
     } catch (error) {
@@ -90,17 +110,20 @@ function initTensorChooserListeners() {
     document.getElementById('select-image-mode')?.addEventListener('click', () => loadView('tensor-image'));
 }
 
+// GANTI: gunakan event delegation satu kali untuk back buttons (hindari multiple listeners)
 function initBackButtonListener() {
-    // Attach listener to any back button used across views (selection and chooser)
-    const backButtons = document.querySelectorAll('.back-to-selection-btn, .back-to-chooser-btn');
-    backButtons.forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            event.preventDefault();
-            // Stop camera stream if running
-            if (typeof window.stopTensorCameraStream === 'function') {
-                window.stopTensorCameraStream();
-            }
-            loadView('tool-selection');
-        });
+    // pastikan listener hanya terpasang sekali
+    if (document.body.dataset.backListenerAttached === '1') return;
+    document.body.dataset.backListenerAttached = '1';
+
+    document.body.addEventListener('click', (e) => {
+        const btn = e.target.closest('.back-to-selection-btn, .back-to-chooser-btn');
+        if (!btn) return;
+        e.preventDefault();
+        // Stop camera stream if running
+        if (typeof window.stopTensorCameraStream === 'function') {
+            try { window.stopTensorCameraStream(); } catch (err) { console.warn('Gagal menghentikan stream:', err); }
+        }
+        loadView('tool-selection');
     });
 }

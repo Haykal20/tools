@@ -59,41 +59,46 @@ function initTextExtractor() {
     async function runOCR(file) {
       resetState();
       progressStatus.textContent = "Mempersiapkan OCR...";
-      
-      const worker = await Tesseract.createWorker('eng+ind', 1, {
+
+      // Buat worker dengan logger yang ada
+      const worker = Tesseract.createWorker({
         logger: info => {
           if (info.status === 'recognizing text') {
             const progress = Math.round(info.progress * 100);
             progressBar.style.width = `${progress}%`;
             progressStatus.textContent = `Mengenali teks... (${progress}%)`;
           } else {
-            // Mengubah status menjadi lebih mudah dibaca, cth: "loading_language_data" -> "Loading language data"
-            const friendlyStatus = info.status.charAt(0).toUpperCase() + info.status.slice(1).replace(/_/g, ' ');
+            const friendlyStatus = String(info.status || '').charAt(0).toUpperCase() + String(info.status || '').slice(1).replace(/_/g, ' ');
             progressStatus.textContent = friendlyStatus + "...";
           }
         }
       });
 
       try {
+        await worker.load();
+        // load & initialize bahasa (ind + eng)
+        await worker.loadLanguage('ind+eng').catch(() => worker.loadLanguage('eng+ind')); // fallback urutan
+        await worker.initialize('ind+eng');
+        progressStatus.textContent = "🔎 Memproses gambar...";
         const { data: { text } } = await worker.recognize(file);
         progressStatus.textContent = "✅ Ekstraksi Selesai!";
-        ocrText = text;
-        output.value = text;
-        
+        ocrText = text || '';
+        output.value = ocrText;
+
         // Aktifkan tombol jika ada teks yang ditemukan
         const hasText = ocrText.trim().length > 0;
         if ('speechSynthesis' in window) {
             speakBtn.disabled = !hasText;
         } else {
-            speakBtn.style.display = 'none'; // Sembunyikan jika tidak didukung
+            speakBtn.style.display = 'none';
         }
         downloadBtn.disabled = !hasText;
 
       } catch (error) {
-        progressStatus.textContent = "Gagal: " + error.message;
+        progressStatus.textContent = "Gagal: " + (error.message || error);
         console.error(error);
       } finally {
-        await worker.terminate();
+        try { await worker.terminate(); } catch(e){ /* ignore */ }
       }
     }
 
