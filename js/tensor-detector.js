@@ -204,10 +204,6 @@ function initTensorDetector() {
         const statusText = document.getElementById('tensor-status');
         const errorMessage = document.getElementById('tensor-error-message');
         let stream = null, animationFrameId = null;
-        // state untuk pengumuman suara agar tidak bicara setiap frame
-        let lastSpokenClasses = [];
-        let lastSpeakTs = 0;
-        const SPEAK_INTERVAL = 3000; // ms minimal antar pengumuman
 
         window.stopTensorDetection = () => {
             if (stream) {
@@ -237,35 +233,7 @@ function initTensorDetector() {
                 context.fillStyle = '#00FFFF';
                 context.fillText(`${translatedClass} (${Math.round(p.score * 100)}%)`, x, y > 10 ? y - 5 : 10);
             });
-+
-+            // LOGIKA SUARA: ambil kelas unik dan bicara jika berubah / melewati interval
-+            try {
-+                const unique = [...new Set(predictions.map(p => p.class))];
-+                const now = Date.now();
-+                const sameAsLast = unique.length === lastSpokenClasses.length && unique.every(c => lastSpokenClasses.includes(c));
-+                if (!sameAsLast && unique.length > 0 && (now - lastSpeakTs) > SPEAK_INTERVAL) {
-+                    const translated = unique.map(c => kamusIndonesia[c] || c);
-+                    const text = `Saya mendeteksi ${translated.length} jenis objek: ${translated.join(', ')}.`;
-+                    const utter = new SpeechSynthesisUtterance(text);
-+                    utter.lang = 'id-ID';
-+                    // batalkan ucapan sebelumnya dan mulai yg baru
-+                    try { speechSynthesis.cancel(); } catch(e) {}
-+                    speechSynthesis.speak(utter);
-+                    lastSpokenClasses = unique;
-+                    lastSpeakTs = now;
-+                } else if (unique.length === 0 && lastSpokenClasses.length > 0 && (now - lastSpeakTs) > SPEAK_INTERVAL) {
-+                    // apabila sebelumnya ada objek lalu kini kosong, beri tahu sekali
-+                    const utter = new SpeechSynthesisUtterance('Tidak ada objek terdeteksi.');
-+                    utter.lang = 'id-ID';
-+                    try { speechSynthesis.cancel(); } catch(e) {}
-+                    speechSynthesis.speak(utter);
-+                    lastSpokenClasses = [];
-+                    lastSpeakTs = now;
-+                }
-+            } catch (e) {
-+                console.warn('Speech synthesis error:', e);
-+            }
-+
+
             animationFrameId = requestAnimationFrame(runDetection);
         }
 
