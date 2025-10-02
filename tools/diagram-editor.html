@@ -1,0 +1,36 @@
+<div id="diagram-tool-view" class="min-h-screen tool-body p-4">
+    <div class="w-full max-w-7xl mx-auto flex flex-col">
+        <div class="mb-4">
+             <button class="back-to-selection-btn flex items-center gap-2 text-slate-300 hover:text-white transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
+            </button>
+        </div>
+       
+        <div class="flex-grow grid md:grid-cols-2 gap-6">
+            <div class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                <div class="p-4 bg-slate-900/50 border-b border-slate-700 text-slate-200 font-semibold flex items-center gap-2">
+                    <i data-lucide="file-code-2" class="w-5 h-5 text-orange-400"></i>
+                    <span>Kode Mermaid</span>
+                </div>
+                <textarea id="editor" class="flex-grow w-full p-4 bg-slate-800/50 text-slate-200 border-none resize-none font-mono text-sm leading-relaxed focus:outline-none" placeholder="Tulis kode Mermaid di sini..."></textarea>
+                <div class="p-4 border-t border-slate-700 bg-slate-900/50">
+                     <div class="grid grid-cols-3 gap-3">
+                        <button onclick="pasteFromClipboard()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="clipboard-paste" class="w-4 h-4"></i><span>Tempel</span></button>
+                        <button onclick="clearEditor()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Hapus</span></button>
+                        <button onclick="downloadSVG()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i><span>SVG</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                <div class="p-4 bg-slate-900/50 border-b border-slate-700 text-slate-200 font-semibold flex items-center gap-2">
+                    <i data-lucide="image" class="w-5 h-5 text-orange-400"></i>
+                    <span>Preview Diagram</span>
+                </div>
+                <div id="preview" class="flex-grow p-5 flex items-center justify-center bg-slate-800/50 min-h-[300px] md:min-h-0">
+                    <p class="text-slate-500">Diagram akan muncul di sini...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

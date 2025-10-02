@@ -58,6 +58,10 @@ async function loadView(viewName) {
                 initQrCodeGenerator();
                 initBackButtonListener();
                 break;
+            case 'diagram-editor':
+                initDiagramEditor();
+                initBackButtonListener();
+                break;
         }
     } catch (error) {
         console.error('Error loading view:', error);
@@ -73,6 +77,7 @@ function initToolSelectionListeners() {
     // Mengarahkan ke halaman pilihan tensor
     document.getElementById('select-tensor-ai')?.addEventListener('click', () => loadView('tensor-chooser'));
     document.getElementById('select-qrcode-generator')?.addEventListener('click', () => loadView('qrcode-generator'));
+    document.getElementById('select-diagram-editor')?.addEventListener('click', () => loadView('diagram-editor'));
 }
 
 // FUNGSI BARU UNTUK MENGHANDLE HALAMAN PILIHAN TENSOR
