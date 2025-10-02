@@ -1,98 +1,93 @@
 // js/main.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Load the tool selection view by default when the page loads
     loadView('tool-selection');
 });
 
-/**
- * Fetches and displays the HTML for a specific tool view.
- * @param {string} viewName - The name of the tool view to load (e.g., 'ai-chat').
- */
 async function loadView(viewName) {
     try {
         const response = await fetch(`tools/${viewName}.html`);
-        if (!response.ok) {
-            throw new Error(`Failed to load view: ${viewName}.html not found.`);
-        }
+        if (!response.ok) throw new Error(`Gagal memuat view: ${viewName}.html`);
         
         const html = await response.text();
         const appContainer = document.getElementById('app-container');
         appContainer.innerHTML = html;
-
-        // Add a fade-in animation to the loaded content
         if (appContainer.firstElementChild) {
             appContainer.firstElementChild.classList.add('view-enter');
         }
-
-        // Re-render Lucide icons for the new view
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
         
-        // Initialize the specific listeners and logic for the loaded view
-        if (viewName === 'tool-selection') {
-            initToolSelectionListeners();
-        } else {
-            // All other views have a "back" button
-            initBackButtonListener();
-            
-            // Call the specific init function for the loaded tool
-            switch (viewName) {
-                case 'ai-chat':
-                    initAiChat();
-                    break;
-                case 'tiktok-downloader':
-                    initTikTokDownloader();
-                    break;
-                case 'number-converter':
-                    initNumberConverter();
-                    break;
-                case 'password-generator':
-                    initPasswordGenerator();
-                    break;
-                case 'tensor-detector':
-                    initTensorDetector();
-                    break;
-                    case 'pdf-merger':
-                    initPdfMerger();
-                    break;
-            }
+        // Memanggil fungsi inisialisasi yang sesuai
+        switch (viewName) {
+            case 'tool-selection':
+                initToolSelectionListeners();
+                break;
+            case 'ai-chat':
+                initAiChat();
+                initBackButtonListener();
+                break;
+            case 'tiktok-downloader':
+                initTikTokDownloader();
+                initBackButtonListener();
+                break;
+            case 'number-converter':
+                initNumberConverter();
+                initBackButtonListener();
+                break;
+            case 'password-generator':
+                initPasswordGenerator();
+                initBackButtonListener();
+                break;
+            case 'pdf-merger':
+                initPdfMerger();
+                initBackButtonListener();
+                break;
+            // KASUS BARU UNTUK TENSOR
+            case 'tensor-chooser':
+                initTensorChooserListeners(); // Inisialisasi untuk halaman pilihan
+                initBackButtonListener();
+                break;
+            case 'tensor-camera':
+                initTensorCamera(); // Inisialisasi untuk mode kamera
+                initBackButtonListener();
+                break;
+            case 'tensor-image':
+                initTensorImage(); // Inisialisasi untuk mode gambar
+                initBackButtonListener();
+                break;
         }
     } catch (error) {
         console.error('Error loading view:', error);
-        document.getElementById('app-container').innerHTML = 
-            `<div class="flex items-center justify-center min-h-screen">
-                <p class="text-center text-red-400">Gagal memuat konten. Periksa konsol untuk detail.</p>
-            </div>`;
     }
 }
 
-/**
- * Sets up event listeners for the tool selection cards on the main page.
- */
 function initToolSelectionListeners() {
     document.getElementById('select-ai-chat')?.addEventListener('click', () => loadView('ai-chat'));
     document.getElementById('select-tiktok-dl')?.addEventListener('click', () => loadView('tiktok-downloader'));
     document.getElementById('select-num-converter')?.addEventListener('click', () => loadView('number-converter'));
     document.getElementById('select-pw-generator')?.addEventListener('click', () => loadView('password-generator'));
-    document.getElementById('select-tensor-ai')?.addEventListener('click', () => loadView('tensor-detector'));
     document.getElementById('select-pdf-merger')?.addEventListener('click', () => loadView('pdf-merger'));
+    // Mengarahkan ke halaman pilihan tensor
+    document.getElementById('select-tensor-ai')?.addEventListener('click', () => loadView('tensor-chooser'));
 }
 
-/**
- * Sets up the event listener for the "Back to Menu" button present in each tool view.
- */
+// FUNGSI BARU UNTUK MENGHANDLE HALAMAN PILIHAN TENSOR
+function initTensorChooserListeners() {
+    document.getElementById('select-camera-mode')?.addEventListener('click', () => loadView('tensor-camera'));
+    document.getElementById('select-image-mode')?.addEventListener('click', () => loadView('tensor-image'));
+}
+
 function initBackButtonListener() {
-    const backButton = document.querySelector('.back-to-selection-btn');
-    if (backButton) {
-        backButton.addEventListener('click', (event) => {
+    // Attach listener to any back button used across views (selection and chooser)
+    const backButtons = document.querySelectorAll('.back-to-selection-btn, .back-to-chooser-btn');
+    backButtons.forEach(btn => {
+        btn.addEventListener('click', (event) => {
             event.preventDefault();
-            // Special cleanup for Tensor AI to stop the camera stream before navigating away
-            if (typeof window.stopTensorDetection === 'function') {
-                window.stopTensorDetection();
+            // Stop camera stream if running
+            if (typeof window.stopTensorCameraStream === 'function') {
+                window.stopTensorCameraStream();
             }
             loadView('tool-selection');
         });
-    }
+    });
 }
