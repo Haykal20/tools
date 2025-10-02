@@ -1,0 +1,55 @@
+<div id="ocr-tool-view" class="min-h-screen tool-body p-4 flex justify-center">
+    <div class="w-full max-w-6xl mx-auto">
+        <button class="back-to-selection-btn mb-4 flex items-center gap-2 text-slate-300 hover:text-white transition">
+           <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
+       </button>
+       <div class="tool-card rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 bg-gradient-to-r from-cyan-500 to-sky-600 text-white text-center">
+               <div class="flex items-center justify-center gap-3 mb-2">
+                    <i data-lucide="scan-text" class="w-7 h-7"></i>
+                    <h1 class="text-3xl font-bold">Ekstraktor Teks dari Gambar (OCR)</h1>
+                </div>
+               <p class="text-cyan-100">Unggah gambar apa pun untuk mengubahnya menjadi teks.</p>
+           </div>
+           
+           <div class="p-6 grid md:grid-cols-2 gap-8">
+                <div class="flex flex-col">
+                    <div id="dropArea" class="border-3 border-dashed border-slate-600 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:border-cyan-500 hover:bg-slate-800/50 flex-grow flex flex-col items-center justify-center min-h-[350px]">
+                        <div id="upload-prompt">
+                            <i data-lucide="upload-cloud" class="mx-auto h-16 w-16 text-slate-500"></i>
+                            <p class="mt-2 font-semibold text-slate-300">Tarik & Lepas gambar di sini</p>
+                            <p class="text-sm text-slate-500">atau klik untuk memilih file</p>
+                        </div>
+                        <img id="imagePreview" class="hidden max-h-80 rounded-lg" alt="Pratinjau Gambar"/>
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                    
+                    <div class="w-full bg-slate-700 rounded-full h-2.5 mt-4">
+                        <div id="progressBar" class="bg-cyan-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="progressStatus" class="text-center text-sm text-slate-400 mt-2 min-h-[20px]">Menunggu gambar...</p>
+                </div>
+
+                <div class="flex flex-col">
+                    <h2 class="text-2xl font-bold text-slate-100 mb-4">Teks Hasil Ekstraksi</h2>
+                    <textarea id="output" class="w-full h-full flex-grow p-4 bg-slate-900/50 border-2 border-slate-700 rounded-lg text-slate-200 resize-none focus:ring-2 focus:ring-cyan-500" placeholder="Hasil teks akan muncul di sini..."></textarea>
+                    
+                    <div class="mt-4">
+                        <label for="langSelect" class="block text-sm font-medium text-slate-400">Bahasa Suara:</label>
+                        <select id="langSelect" class="mt-1 block w-full pl-3 pr-10 py-2 bg-slate-700 border-slate-600 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm rounded-md">
+                            <option value="id-ID">Indonesia</option>
+                            <option value="en-US">English (US)</option>
+                            <option value="en-GB">English (UK)</option>
+                            <option value="ja-JP">Japanese</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                        <button id="speakBtn" disabled class="flex-1 bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-green-700 disabled:bg-slate-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"><i data-lucide="volume-2" class="w-5 h-5"></i> Bacakan</button>
+                        <button id="downloadBtn" disabled class="flex-1 bg-slate-600 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"><i data-lucide="download" class="w-5 h-5"></i> Unduh .txt</button>
+                    </div>
+                </div>
+           </div>
+       </div>
+   </div>
+</div>

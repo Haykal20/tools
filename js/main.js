@@ -62,6 +62,10 @@ async function loadView(viewName) {
                 initDiagramEditor();
                 initBackButtonListener();
                 break;
+            case 'text-extractor':
+                initTextExtractor();
+                initBackButtonListener();
+                break;
         }
     } catch (error) {
         console.error('Error loading view:', error);
@@ -74,10 +78,10 @@ function initToolSelectionListeners() {
     document.getElementById('select-num-converter')?.addEventListener('click', () => loadView('number-converter'));
     document.getElementById('select-pw-generator')?.addEventListener('click', () => loadView('password-generator'));
     document.getElementById('select-pdf-merger')?.addEventListener('click', () => loadView('pdf-merger'));
-    // Mengarahkan ke halaman pilihan tensor
     document.getElementById('select-tensor-ai')?.addEventListener('click', () => loadView('tensor-chooser'));
     document.getElementById('select-qrcode-generator')?.addEventListener('click', () => loadView('qrcode-generator'));
     document.getElementById('select-diagram-editor')?.addEventListener('click', () => loadView('diagram-editor'));
+    document.getElementById('select-text-extractor')?.addEventListener('click', () => loadView('text-extractor'));
 }
 
 // FUNGSI BARU UNTUK MENGHANDLE HALAMAN PILIHAN TENSOR
