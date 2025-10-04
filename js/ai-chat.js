@@ -50,8 +50,26 @@ function initAiChat() {
     }
 
     function parseMarkdown(text) {
-        // Escape HTML characters first to prevent unwanted HTML rendering
-        const escapedText = text
+        // Handle code blocks separately
+        const codeBlockRegex = /```([\s\S]*?)```/g;
+        const inlineCodeRegex = /`([^`]+)`/g;
+        
+        // First, extract and preserve code blocks
+        const codeBlocks = [];
+        let processedText = text.replace(codeBlockRegex, (match, codeContent) => {
+            codeBlocks.push(codeContent);
+            return `\uE000${codeBlocks.length - 1}\uE001`;
+        });
+        
+        // Then, extract and preserve inline code
+        const inlineCodes = [];
+        processedText = processedText.replace(inlineCodeRegex, (match, codeContent) => {
+            inlineCodes.push(codeContent);
+            return `\uE002${inlineCodes.length - 1}\uE003`;
+        });
+        
+        // Escape HTML in the remaining text (but not in the preserved code blocks)
+        processedText = processedText
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
@@ -59,7 +77,21 @@ function initAiChat() {
             .replace(/'/g, '&#039;');
         
         // Convert **text** to bold
-        return escapedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Restore code blocks with proper formatting
+        processedText = processedText.replace(/\uE000(\d+)\uE001/g, (match, index) => {
+            const code = codeBlocks[index];
+            return `<pre><code>${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+        });
+        
+        // Restore inline code
+        processedText = processedText.replace(/\uE002(\d+)\uE003/g, (match, index) => {
+            const code = inlineCodes[index];
+            return `<code>${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`;
+        });
+        
+        return processedText;
     }
 
     async function handleFormSubmit(e) {

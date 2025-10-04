@@ -333,6 +333,7 @@ animation: typingAnimation 1.4s infinite ease-in-out;
     padding: 0.2em 0.4em;
     border-radius: 3px;
     font-size: 0.9em;
+    color: #e5e7eb;
 }
 
 .ai-message-content pre {
@@ -341,10 +342,22 @@ animation: typingAnimation 1.4s infinite ease-in-out;
     border-radius: 6px;
     overflow-x: auto;
     margin: 0.5rem 0;
+    border-left: 4px solid #3b82f6;
 }
 
 .ai-message-content pre code {
     background: none;
     padding: 0;
     border-radius: 0;
+    color: #e5e7eb;
+    font-size: 0.85em;
 }
+
+/* Syntax highlighting for common code elements */
+.ai-message-content .hljs-keyword { color: #f87171; }
+.ai-message-content .hljs-string { color: #86efac; }
+.ai-message-content .hljs-comment { color: #9ca3af; }
+.ai-message-content .hljs-function { color: #93c5fd; }
+.ai-message-content .hljs-number { color: #fbbf24; }
+.ai-message-content .hljs-tag { color: #7dd3fc; }
+.ai-message-content .hljs-attr { color: #c7d2fe; }
