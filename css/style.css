@@ -334,6 +334,8 @@ animation: typingAnimation 1.4s infinite ease-in-out;
     border-radius: 3px;
     font-size: 0.9em;
     color: #e5e7eb;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .ai-message-content pre {
@@ -343,6 +345,9 @@ animation: typingAnimation 1.4s infinite ease-in-out;
     overflow-x: auto;
     margin: 0.5rem 0;
     border-left: 4px solid #3b82f6;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .ai-message-content pre code {
@@ -351,6 +356,8 @@ animation: typingAnimation 1.4s infinite ease-in-out;
     border-radius: 0;
     color: #e5e7eb;
     font-size: 0.85em;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 /* Syntax highlighting for common code elements */

@@ -11,22 +11,83 @@ function initAiChat() {
     const confirmationModal = document.getElementById('confirmation-modal');
     const confirmChangeBtn = document.getElementById('confirm-change-btn');
     const cancelChangeBtn = document.getElementById('cancel-change-btn');
+    const clearChatBtn = document.getElementById('clear-chat-btn');
     
     // Check if elements exist before proceeding
-    if (!chatContainer || !chatForm) return;
+    if (!chatContainer || !chatForm || !clearChatBtn) return;
 
     let messages = [];
     let currentModel = modelSelector.value;
     let isFirstMessage = true;
 
+    // Load messages from localStorage
+    function loadMessages() {
+        const savedMessages = localStorage.getItem('aiChatMessages');
+        const savedModel = localStorage.getItem('aiChatModel');
+        
+        if (savedMessages) {
+            messages = JSON.parse(savedMessages);
+            renderSavedMessages();
+            isFirstMessage = messages.length === 0;
+        }
+        
+        if (savedModel) {
+            modelSelector.value = savedModel;
+            currentModel = savedModel;
+        }
+    }
+
+    // Save messages to localStorage
+    function saveMessages() {
+        localStorage.setItem('aiChatMessages', JSON.stringify(messages));
+        localStorage.setItem('aiChatModel', modelSelector.value);
+    }
+
+    // Render saved messages
+    function renderSavedMessages() {
+        chatContainer.innerHTML = '';
+        messages.forEach(msg => {
+            if (msg.role === 'system') {
+                appendSystemMessage(msg.content);
+            } else if (msg.role === 'user') {
+                appendMessage('user', msg.content);
+            } else if (msg.role === 'assistant') {
+                appendMessage('assistant', msg.content);
+            }
+        });
+        scrollToBottom();
+    }
+
+    // Clear chat history
+    function clearChatHistory() {
+        const confirmClear = confirm('Apakah Anda yakin ingin menghapus semua riwayat chat?');
+        if (confirmClear) {
+            messages = [];
+            chatContainer.innerHTML = '';
+            localStorage.removeItem('aiChatMessages');
+            localStorage.removeItem('aiChatModel');
+            
+            // Add welcome message
+            appendSystemMessage('Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!');
+            messages.push({ role: 'system', content: 'Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!' });
+            isFirstMessage = false;
+        }
+    }
+
     chatForm.addEventListener('submit', handleFormSubmit);
     modelSelector.addEventListener('change', handleModelChange);
     confirmChangeBtn.addEventListener('click', confirmModelChange);
     cancelChangeBtn.addEventListener('click', cancelModelChange);
+    clearChatBtn.addEventListener('click', clearChatHistory);
+
+    // Load messages on init
+    loadMessages();
 
     if (isFirstMessage) {
         appendSystemMessage('Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!');
+        messages.push({ role: 'system', content: 'Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!' });
         isFirstMessage = false;
+        saveMessages();
     }
 
     function handleModelChange() {
@@ -39,9 +100,11 @@ function initAiChat() {
         chatContainer.innerHTML = '';
         const modelName = modelSelector.options[modelSelector.selectedIndex].text;
         appendSystemMessage(`Model diubah ke ${modelName}. Percakapan dimulai ulang.`);
+        messages.push({ role: 'system', content: `Model diubah ke ${modelName}. Percakapan dimulai ulang.` });
         userInput.focus();
         currentModel = modelSelector.value;
         confirmationModal.style.display = 'none';
+        saveMessages(); // Save after model change
     }
 
     function cancelModelChange() {
@@ -100,6 +163,7 @@ function initAiChat() {
         if (!userMessage) return;
         appendMessage('user', userMessage);
         messages.push({ role: 'user', content: userMessage });
+        saveMessages(); // Save after user message
         userInput.value = '';
         setFormDisabled(true);
         loadingIndicator.classList.remove('hidden');
@@ -108,9 +172,12 @@ function initAiChat() {
             const aiResponse = await getAIResponse(modelSelector.value);
             appendMessage('assistant', aiResponse);
             messages.push({ role: 'assistant', content: aiResponse });
+            saveMessages(); // Save after AI response
         } catch (error) {
             console.error("Error:", error);
             appendMessage('assistant', "Maaf, terjadi kesalahan. Coba lagi.", true);
+            messages.push({ role: 'assistant', content: "Maaf, terjadi kesalahan. Coba lagi.", isError: true });
+            saveMessages(); // Save even on error
         } finally {
             loadingIndicator.classList.add('hidden');
             setFormDisabled(false);
@@ -137,6 +204,8 @@ function initAiChat() {
         msgWrapper.className = 'flex items-start gap-3';
         msgContent.className = 'rounded-lg p-3 max-w-lg shadow';
         msgContent.style.whiteSpace = 'pre-wrap';
+        msgContent.style.overflowWrap = 'break-word'; // Tambahkan ini
+        msgContent.style.wordBreak = 'break-word'; // Tambahkan ini
         
         if (sender === 'user') {
             msgContent.textContent = text;
