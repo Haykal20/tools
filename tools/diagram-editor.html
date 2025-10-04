@@ -16,6 +16,11 @@
                         <input type="checkbox" id="themeToggle">
                         <span class="slider round"></span>
                     </label>
+                    <!-- Tambah opsi transparan -->
+                    <label class="ml-4 flex items-center text-sm text-slate-400 gap-2">
+                        <input type="checkbox" id="transparentToggle" class="h-4 w-4">
+                        <span>Transparan</span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -41,10 +46,11 @@
                     </div>
                 </div>
                 <div class="p-4 border-t border-slate-700 bg-slate-900/50">
-                     <div class="grid grid-cols-3 gap-3">
+                     <div class="grid grid-cols-4 gap-3">
                         <button onclick="pasteFromClipboard()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="clipboard-paste" class="w-4 h-4"></i><span>Tempel</span></button>
                         <button onclick="clearEditor()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i><span>Hapus</span></button>
                         <button onclick="downloadSVG()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i><span>SVG</span></button>
+                        <button onclick="downloadPNGHD()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="image" class="w-4 h-4"></i><span>PNG (HD)</span></button>
                     </div>
                 </div>
             </div>
@@ -54,7 +60,10 @@
             <div class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full">
                 <div class="p-4 bg-slate-900/50 border-b border-slate-700 text-slate-200 font-semibold flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2"><i data-lucide="monitor" class="w-5 h-5 text-orange-400"></i><span>Tampilan Diagram</span></div>
-                    <button onclick="downloadSVG()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2 text-sm"><i data-lucide="download" class="w-4 h-4"></i><span>Unduh SVG</span></button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="downloadSVG()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2 text-sm"><i data-lucide="download" class="w-4 h-4"></i><span>Unduh SVG</span></button>
+                        <button onclick="downloadPNGHD()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2 text-sm"><i data-lucide="image" class="w-4 h-4"></i><span>Unduh PNG (HD)</span></button>
+                    </div>
                 </div>
                 <div id="fullViewPreview" class="flex-grow p-5 flex items-center justify-center bg-slate-800/50">
                     <p class="text-slate-500">Diagram akan muncul di sini...</p>
