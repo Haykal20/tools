@@ -368,3 +368,29 @@ animation: typingAnimation 1.4s infinite ease-in-out;
 .ai-message-content .hljs-number { color: #fbbf24; }
 .ai-message-content .hljs-tag { color: #7dd3fc; }
 .ai-message-content .hljs-attr { color: #c7d2fe; }
+
+/* Loading indicator fixed (chat typing) */
+.chat-loading-fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 88px; /* di atas footer */
+    display: flex;
+    justify-content: center;
+    z-index: 40;
+    pointer-events: none; /* biarkan klik menerus ke elemen bawah, inner tetap clickable jika perlu */
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Inner indicator aktif harus bisa menerima pointer events */
+.chat-loading-fixed .pointer-events-auto { pointer-events: auto; }
+
+/* Mobile adjustments: beri lebih lebar pesan untuk layar kecil */
+@media (max-width: 640px) {
+    .ai-message-content pre, .ai-message-content code {
+        font-size: 0.9rem;
+    }
+    /* chat message max width handled inline, tetapi tambahan safety: */
+    .chat- message { max-width: 90%; }
+}

@@ -17,8 +17,9 @@
 
     <main id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar"></main>
     
-    <div id="loading-indicator" class="hidden px-6 pb-2">
-        <div class="flex items-center gap-3">
+    <!-- Loading indicator fixed: tetap di posisi bawah layar, tidak mengikuti scroll chat -->
+    <div id="loading-indicator" aria-hidden="true" class="chat-loading-fixed hidden px-6 pb-2">
+        <div class="flex items-center gap-3 pointer-events-auto">
             <div class="bg-gray-700 p-2 rounded-full"><i data-lucide="bot" class="text-teal-400"></i></div>
             <div class="bg-gray-800 rounded-lg p-3 flex items-center shadow">
                 <div class="typing-indicator">

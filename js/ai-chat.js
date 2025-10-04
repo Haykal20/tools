@@ -57,6 +57,7 @@ function initAiChat() {
                 appendMessage('assistant', msg.content);
             }
         });
+        // Rendered from storage — scroll to bottom so user sees latest on open
         scrollToBottom();
     }
 
@@ -168,10 +169,10 @@ function initAiChat() {
         saveMessages(); // Save after user message
         userInput.value = '';
         setFormDisabled(true);
-        loadingIndicator.classList.remove('hidden');
-        scrollToBottom();
+        loadingIndicator.classList.remove('hidden'); // show typing indicator (now fixed)
+        // jangan paksa scroll ke bottom di sini — appendMessage akan handle auto-scroll sesuai posisi user
         try {
-            const aiResponse = await getAIResponse(modelSelector.value);
+            const aiResponse = await getAIResponse(modelSelector ? modelSelector.value : currentModel);
             appendMessage('assistant', aiResponse);
             messages.push({ role: 'assistant', content: aiResponse });
             saveMessages(); // Save after AI response
@@ -200,19 +201,28 @@ function initAiChat() {
         return data.choices[0].message.content;
     }
 
+    // Tambahkan helper untuk cek apakah user berada dekat bottom
+    function isUserNearBottom(threshold = 120) {
+        if (!chatContainer) return true;
+        return (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight) < threshold;
+    }
+
     function appendMessage(sender, text, isError = false) {
         const msgWrapper = document.createElement('div'), msgContent = document.createElement('div'), iconDiv = document.createElement('div');
         iconDiv.className = 'bg-gray-700 p-2 rounded-full self-start';
         msgWrapper.className = 'flex items-start gap-3';
         msgContent.className = 'rounded-lg p-3 max-w-lg shadow';
-        
-        // Limit visual overflow and keep formatting
+
+        // Cek apakah user sedang dekat bottom sebelum append
+        const shouldScroll = isUserNearBottom();
+
+        // Limit visual overflow and keep formatting (lebih ramah mobile)
         msgContent.style.whiteSpace = 'pre-wrap';
         msgContent.style.overflowWrap = 'break-word';
         msgContent.style.wordBreak = 'break-word';
         msgContent.style.boxSizing = 'border-box';
-        msgContent.style.maxWidth = 'min(70ch, 60%)';
-         
+        msgContent.style.maxWidth = 'min(70ch, 85%)'; // ubah jadi 85% agar mobile tidak terlalu ke kanan
+
         if (sender === 'user') {
             msgContent.textContent = text;
             msgWrapper.classList.add('justify-end');
@@ -226,10 +236,12 @@ function initAiChat() {
             iconDiv.innerHTML = `<i data-lucide="bot" class="text-teal-400"></i>`;
             msgWrapper.append(iconDiv, msgContent);
         }
-        
+
         chatContainer.appendChild(msgWrapper);
         if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
-        scrollToBottom();
+
+        // Hanya scroll jika user sebelumnya sudah berada di bottom / near bottom
+        if (shouldScroll) scrollToBottom();
     }
 
     function appendSystemMessage(text) {
