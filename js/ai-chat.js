@@ -6,18 +6,18 @@ function initAiChat() {
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
     const loadingIndicator = document.getElementById('loading-indicator');
-    const submitButton = chatForm.querySelector('button');
+    const submitButton = chatForm ? chatForm.querySelector('button') : null;
     const modelSelector = document.getElementById('model-selector');
     const confirmationModal = document.getElementById('confirmation-modal');
     const confirmChangeBtn = document.getElementById('confirm-change-btn');
     const cancelChangeBtn = document.getElementById('cancel-change-btn');
-    const clearChatBtn = document.getElementById('clear-chat-btn');
-    
-    // Check if elements exist before proceeding
-    if (!chatContainer || !chatForm || !clearChatBtn) return;
+    const clearChatBtn = document.getElementById('clear-chat-btn'); // optional
+
+    // Minimal required elements
+    if (!chatContainer || !chatForm) return;
 
     let messages = [];
-    let currentModel = modelSelector.value;
+    let currentModel = modelSelector ? modelSelector.value : '';
     let isFirstMessage = true;
 
     // Load messages from localStorage
@@ -31,7 +31,7 @@ function initAiChat() {
             isFirstMessage = messages.length === 0;
         }
         
-        if (savedModel) {
+        if (savedModel && modelSelector) {
             modelSelector.value = savedModel;
             currentModel = savedModel;
         }
@@ -39,8 +39,10 @@ function initAiChat() {
 
     // Save messages to localStorage
     function saveMessages() {
-        localStorage.setItem('aiChatMessages', JSON.stringify(messages));
-        localStorage.setItem('aiChatModel', modelSelector.value);
+        // limit stored messages to avoid localStorage ballooning
+        const toSave = messages.slice(-200);
+        localStorage.setItem('aiChatMessages', JSON.stringify(toSave));
+        if (modelSelector) localStorage.setItem('aiChatModel', modelSelector.value);
     }
 
     // Render saved messages
@@ -75,10 +77,10 @@ function initAiChat() {
     }
 
     chatForm.addEventListener('submit', handleFormSubmit);
-    modelSelector.addEventListener('change', handleModelChange);
-    confirmChangeBtn.addEventListener('click', confirmModelChange);
-    cancelChangeBtn.addEventListener('click', cancelModelChange);
-    clearChatBtn.addEventListener('click', clearChatHistory);
+    if (modelSelector) modelSelector.addEventListener('change', handleModelChange);
+    if (confirmChangeBtn) confirmChangeBtn.addEventListener('click', confirmModelChange);
+    if (cancelChangeBtn) cancelChangeBtn.addEventListener('click', cancelModelChange);
+    if (clearChatBtn) clearChatBtn.addEventListener('click', clearChatHistory);
 
     // Load messages on init
     loadMessages();
@@ -102,13 +104,13 @@ function initAiChat() {
         appendSystemMessage(`Model diubah ke ${modelName}. Percakapan dimulai ulang.`);
         messages.push({ role: 'system', content: `Model diubah ke ${modelName}. Percakapan dimulai ulang.` });
         userInput.focus();
-        currentModel = modelSelector.value;
+        if (modelSelector) currentModel = modelSelector.value;
         confirmationModal.style.display = 'none';
         saveMessages(); // Save after model change
     }
 
     function cancelModelChange() {
-        modelSelector.value = currentModel;
+        if (modelSelector) modelSelector.value = currentModel;
         confirmationModal.style.display = 'none';
     }
 
@@ -203,10 +205,14 @@ function initAiChat() {
         iconDiv.className = 'bg-gray-700 p-2 rounded-full self-start';
         msgWrapper.className = 'flex items-start gap-3';
         msgContent.className = 'rounded-lg p-3 max-w-lg shadow';
-        msgContent.style.whiteSpace = 'pre-wrap';
-        msgContent.style.overflowWrap = 'break-word'; // Tambahkan ini
-        msgContent.style.wordBreak = 'break-word'; // Tambahkan ini
         
+        // Limit visual overflow and keep formatting
+        msgContent.style.whiteSpace = 'pre-wrap';
+        msgContent.style.overflowWrap = 'break-word';
+        msgContent.style.wordBreak = 'break-word';
+        msgContent.style.boxSizing = 'border-box';
+        msgContent.style.maxWidth = 'min(70ch, 60%)';
+         
         if (sender === 'user') {
             msgContent.textContent = text;
             msgWrapper.classList.add('justify-end');
@@ -222,7 +228,7 @@ function initAiChat() {
         }
         
         chatContainer.appendChild(msgWrapper);
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
         scrollToBottom();
     }
 
@@ -241,7 +247,7 @@ function initAiChat() {
 
     function setFormDisabled(isDisabled) {
         userInput.disabled = isDisabled;
-        submitButton.disabled = isDisabled;
+        if (submitButton) submitButton.disabled = isDisabled;
         userInput.placeholder = isDisabled ? "AI sedang berpikir..." : "Ketik pesan Anda di sini...";
         if (!isDisabled) userInput.focus();
     }
