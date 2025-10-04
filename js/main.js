@@ -43,15 +43,15 @@ async function loadView(viewName) {
                 initBackButtonListener();
                 break;
             case 'tensor-chooser':
-                initTensorChooserListeners(); // Inisialisasi untuk halaman pilihan
+                initTensorChooserListeners();
                 initBackButtonListener();
                 break;
             case 'tensor-camera':
-                initTensorCamera(); // Inisialisasi untuk mode kamera
+                initTensorCamera();
                 initBackButtonListener();
                 break;
             case 'tensor-image':
-                initTensorImage(); // Inisialisasi untuk mode gambar
+                initTensorImage();
                 initBackButtonListener();
                 break;
             case 'qrcode-generator':
@@ -66,28 +66,65 @@ async function loadView(viewName) {
                 initTextExtractor();
                 initBackButtonListener();
                 break;
+            default:
+                console.warn(`Tidak ada inisialisasi untuk view: ${viewName}`);
         }
     } catch (error) {
         console.error('Error loading view:', error);
+        const appContainer = document.getElementById('app-container');
+        appContainer.innerHTML = `
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold text-red-400 mb-4">Error Memuat Halaman</h2>
+                    <p class="text-slate-400">Gagal memuat ${viewName}.html</p>
+                    <button onclick="loadView('tool-selection')" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg">
+                        Kembali ke Menu Utama
+                    </button>
+                </div>
+            </div>
+        `;
     }
 }
 
 function initToolSelectionListeners() {
-    document.getElementById('select-ai-chat')?.addEventListener('click', () => loadView('ai-chat'));
-    document.getElementById('select-tiktok-dl')?.addEventListener('click', () => loadView('tiktok-downloader'));
-    document.getElementById('select-num-converter')?.addEventListener('click', () => loadView('number-converter'));
-    document.getElementById('select-pw-generator')?.addEventListener('click', () => loadView('password-generator'));
-    document.getElementById('select-pdf-merger')?.addEventListener('click', () => loadView('pdf-merger'));
-    document.getElementById('select-tensor-ai')?.addEventListener('click', () => loadView('tensor-chooser'));
-    document.getElementById('select-qrcode-generator')?.addEventListener('click', () => loadView('qrcode-generator'));
-    document.getElementById('select-diagram-editor')?.addEventListener('click', () => loadView('diagram-editor'));
-    document.getElementById('select-text-extractor')?.addEventListener('click', () => loadView('text-extractor'));
+    const tools = {
+        'select-ai-chat': 'ai-chat',
+        'select-tiktok-dl': 'tiktok-downloader',
+        'select-num-converter': 'number-converter',
+        'select-pw-generator': 'password-generator',
+        'select-pdf-merger': 'pdf-merger',
+        'select-tensor-ai': 'tensor-chooser',
+        'select-qrcode-generator': 'qrcode-generator',
+        'select-diagram-editor': 'diagram-editor',
+        'select-text-extractor': 'text-extractor'
+    };
+
+    Object.entries(tools).forEach(([id, view]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', () => loadView(view));
+        } else {
+            console.warn(`Element dengan id ${id} tidak ditemukan`);
+        }
+    });
 }
 
 // FUNGSI BARU UNTUK MENGHANDLE HALAMAN PILIHAN TENSOR
 function initTensorChooserListeners() {
-    document.getElementById('select-camera-mode')?.addEventListener('click', () => loadView('tensor-camera'));
-    document.getElementById('select-image-mode')?.addEventListener('click', () => loadView('tensor-image'));
+    const cameraMode = document.getElementById('select-camera-mode');
+    const imageMode = document.getElementById('select-image-mode');
+    
+    if (cameraMode) {
+        cameraMode.addEventListener('click', () => loadView('tensor-camera'));
+    } else {
+        console.warn('Element select-camera-mode tidak ditemukan');
+    }
+    
+    if (imageMode) {
+        imageMode.addEventListener('click', () => loadView('tensor-image'));
+    } else {
+        console.warn('Element select-image-mode tidak ditemukan');
+    }
 }
 
 function initBackButtonListener() {
@@ -104,3 +141,18 @@ function initBackButtonListener() {
         });
     });
 }
+
+// Tambahkan fungsi global untuk error handling
+window.handleGlobalError = function(error) {
+    console.error('Global error:', error);
+    // Bisa ditambahkan notifikasi error ke user di sini
+};
+
+// Global error handler
+window.addEventListener('error', (event) => {
+    handleGlobalError(event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    handleGlobalError(event.reason);
+});
