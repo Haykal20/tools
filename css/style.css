@@ -1,13 +1,12 @@
 /* --- GAYA GLOBAL & DASAR --- */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #0f172a; /* Slate 900 */
+    background-color: #0f172a;
     touch-action: manipulation;
     overflow-x: hidden;
 }
 
 * {
-    /* Menghilangkan highlight biru saat disentuh di mobile */
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -15,12 +14,11 @@ body {
      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 .tool-card {
-     background: rgba(30, 41, 59, 0.5); /* Slate 800 with transparency */
+     background: rgba(30, 41, 59, 0.5);
      backdrop-filter: blur(10px);
-     border: 1px solid rgba(51, 65, 85, 0.5); /* Slate 700 with transparency */
+     border: 1px solid rgba(51, 65, 85, 0.5);
 }
 
-/* Animasi fade-in untuk view */
 .view-enter {
     opacity: 0;
     animation: fadeIn 0.5s forwards;
@@ -29,23 +27,21 @@ body {
     to { opacity: 1; }
 }
 
-/* --- GAYA UNTUK AI CHAT --- */
 
-/* Custom Scrollbar */
+/* --- GAYA UNTUK AI CHAT (DIPERBAIKI) --- */
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; } /* Slate 800 */
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; } /* Slate 600 */
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; } /* Slate 500 */
+.custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-/* Indikator "AI sedang mengetik..." yang posisinya tetap */
+/* Indikator "AI sedang mengetik..." yang posisinya tetap di KIRI */
 .chat-loading-fixed {
-    position: fixed;
-    bottom: 90px; /* Disesuaikan agar pas di atas footer input */
-    left: 0;
-    right: 0;
+    position: absolute; /* Menggunakan absolute terhadap parent yang 'relative' */
+    bottom: 90px;      /* Jarak dari bawah, di atas area input */
+    left: 1rem;        /* Jarak dari kiri */
+    right: auto;       /* Hapus right: 0 agar tidak melebar */
     display: flex;
-    justify-content: center;
-    padding: 0 1rem;
+    justify-content: flex-start; /* Aligment ke kiri */
     z-index: 10;
     pointer-events: none;
 }
@@ -53,7 +49,6 @@ body {
     pointer-events: auto;
 }
 
-/* Animasi typing dot yang modern */
 .typing-indicator {
     display: flex;
     align-items: center;
@@ -77,15 +72,15 @@ body {
 /* Styling untuk blok kode dari AI */
 pre {
     position: relative;
-    background-color: #111827; /* gray-900 */
-    color: #d1d5db; /* gray-300 */
+    background-color: #111827;
+    color: #d1d5db;
     padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
     margin: 0.5rem 0;
-    border: 1px solid #374155; /* gray-700 */
+    border: 1px solid #374155;
 }
 pre code {
     white-space: pre;
@@ -95,8 +90,8 @@ pre code {
     position: absolute;
     top: 8px;
     right: 8px;
-    background-color: #4b5563; /* gray-600 */
-    color: #e5e7eb; /* gray-200 */
+    background-color: #4b5563;
+    color: #e5e7eb;
     border: none;
     padding: 4px 8px;
     border-radius: 6px;
@@ -109,9 +104,8 @@ pre:hover .copy-code-btn {
     opacity: 1;
 }
 .copy-code-btn:hover {
-    background-color: #6b7280; /* gray-500 */
+    background-color: #6b7280;
 }
-
 
 /* --- GAYA UNTUK TIKTOK DOWNLOADER --- */
 .tiktok-tool-body {
