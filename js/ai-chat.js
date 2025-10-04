@@ -50,8 +50,27 @@ function initAiChat() {
     }
 
     function parseMarkdown(text) {
+        // Convert headings (#, ##, ###)
+        text = text.replace(/^# (.*$)/gim, '<h1 class="text-lg font-bold text-white mb-2">$1</h1>');
+        text = text.replace(/^## (.*$)/gim, '<h2 class="text-md font-semibold text-white mb-2">$1</h2>');
+        text = text.replace(/^### (.*$)/gim, '<h3 class="text-sm font-medium text-white mb-1">$1</h3>');
+        
         // Convert **text** to bold
-        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
+        
+        // Convert *text* to italic
+        text = text.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+        
+        // Convert `code` to inline code
+        text = text.replace(/`(.*?)`/g, '<code class="bg-gray-700 px-1 py-0.5 rounded text-sm font-mono">$1</code>');
+        
+        // Convert ```code blocks```
+        text = text.replace(/```(\w+)?\s*([\s\S]*?)```/g, '<pre class="bg-gray-700 p-3 rounded my-2 overflow-x-auto"><code class="text-sm font-mono">$2</code></pre>');
+        
+        // Convert paragraphs (handle line breaks)
+        text = text.replace(/([^\n])\n([^\n])/g, '$1<br>$2');
+        
+        return text;
     }
 
     async function handleFormSubmit(e) {
