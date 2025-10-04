@@ -28,20 +28,19 @@ body {
 }
 
 
-/* --- GAYA UNTUK AI CHAT (DIPERBAIKI) --- */
+/* --- GAYA UNTUK AI CHAT --- */
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-/* Indikator "AI sedang mengetik..." yang posisinya tetap di KIRI */
 .chat-loading-fixed {
-    position: absolute; /* Menggunakan absolute terhadap parent yang 'relative' */
-    bottom: 90px;      /* Jarak dari bawah, di atas area input */
-    left: 1rem;        /* Jarak dari kiri */
-    right: auto;       /* Hapus right: 0 agar tidak melebar */
+    position: absolute;
+    bottom: 90px;
+    left: 1rem;
+    right: auto;
     display: flex;
-    justify-content: flex-start; /* Aligment ke kiri */
+    justify-content: flex-start;
     z-index: 10;
     pointer-events: none;
 }
@@ -49,18 +48,8 @@ body {
     pointer-events: auto;
 }
 
-.typing-indicator {
-    display: flex;
-    align-items: center;
-}
-.typing-dot {
-    width: 8px;
-    height: 8px;
-    margin: 0 2px;
-    background-color: #9ca3af;
-    border-radius: 50%;
-    animation: typing-bounce 1.4s infinite ease-in-out both;
-}
+.typing-indicator { display: flex; align-items: center; }
+.typing-dot { width: 8px; height: 8px; margin: 0 2px; background-color: #9ca3af; border-radius: 50%; animation: typing-bounce 1.4s infinite ease-in-out both; }
 .typing-dot:nth-child(1) { animation-delay: -0.32s; }
 .typing-dot:nth-child(2) { animation-delay: -0.16s; }
 
@@ -69,60 +58,18 @@ body {
     40% { transform: scale(1.0); }
 }
 
-/* Styling untuk blok kode dari AI */
-pre {
-    position: relative;
-    background-color: #111827;
-    color: #d1d5db;
-    padding: 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9em;
-    margin: 0.5rem 0;
-    border: 1px solid #374155;
-}
-pre code {
-    white-space: pre;
-    word-wrap: normal;
-}
-.copy-code-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: #4b5563;
-    color: #e5e7eb;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    cursor: pointer;
-    opacity: 0.2;
-    transition: opacity 0.2s, background-color 0.2s;
-}
-pre:hover .copy-code-btn {
-    opacity: 1;
-}
-.copy-code-btn:hover {
-    background-color: #6b7280;
-}
+pre { position: relative; background-color: #111827; color: #d1d5db; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.9em; margin: 0.5rem 0; border: 1px solid #374155; }
+pre code { white-space: pre; word-wrap: normal; }
+.copy-code-btn { position: absolute; top: 8px; right: 8px; background-color: #4b5563; color: #e5e7eb; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; opacity: 0.2; transition: opacity 0.2s, background-color 0.2s; }
+pre:hover .copy-code-btn { opacity: 1; }
+.copy-code-btn:hover { background-color: #6b7280; }
+
 
 /* --- GAYA UNTUK TIKTOK DOWNLOADER --- */
-.tiktok-tool-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-.glass-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
+.tiktok-tool-body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
 .pulse { animation: pulse 2s infinite; }
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(255, 42, 109, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0); }
-}
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 42, 109, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0); } }
 .slide-container { display: flex; overflow-x: auto; gap: 15px; padding: 15px 0; scrollbar-width: none; -ms-overflow-style: none; }
 .slide-container::-webkit-scrollbar { display: none; }
 .slide-image { min-width: 150px; height: 150px; object-fit: cover; border-radius: 12px; border: 3px solid #fff; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
@@ -132,37 +79,41 @@ pre:hover .copy-code-btn {
 #tiktok-result.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
 /* --- GAYA UNTUK TENSOR DETECTOR & OCR --- */
-.loader {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top: 4px solid #fff;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
+.loader { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.drop-area-base { border: 3px dashed #475569; border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.drop-area-highlight { border-color: #f59e0b; background-color: rgba(51, 65, 85, 0.5); }
+.result-box { border: 1px solid transparent; transition: all 0.2s ease-in-out; }
+
+
+/* --- GAYA UNTUK PDF MERGER (YANG SEBELUMNYA HILANG) --- */
+#fileInput {
+    display: none;
 }
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.drop-area-base {
-    border: 3px dashed #475569;
-    border-radius: 12px;
-    padding: 32px;
-    text-align: center;
+.btn {
+    background: #38bdf8; /* Sky 400 */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background 0.3s;
+    width: 100%;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
-.drop-area-highlight {
-    border-color: #f59e0b; /* Amber 500 */
-    background-color: rgba(51, 65, 85, 0.5); /* Slate 700 with transparency */
+.btn:hover:not(:disabled) {
+    background: #0ea5e9; /* Sky 500 */
 }
-.result-box {
-    border: 1px solid transparent;
-    transition: all 0.2s ease-in-out;
+.btn:disabled {
+    background: #475569; /* Slate 600 */
+    cursor: not-allowed;
+    opacity: 0.6;
 }
-
-
-/* --- GAYA UNTUK PDF MERGER --- */
 .drop-area {
     border: 3px dashed #475569;
     border-radius: 12px;
@@ -234,37 +185,10 @@ pre:hover .copy-code-btn {
 
 
 /* --- GAYA UNTUK DIAGRAM EDITOR --- */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 24px;
-}
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #4A5568;
-  transition: .4s;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-}
+.switch { position: relative; display: inline-block; width: 40px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4A5568; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
 input:checked + .slider { background-color: #2563EB; }
 input:focus + .slider { box-shadow: 0 0 1px #2563EB; }
 input:checked + .slider:before { transform: translateX(16px); }
