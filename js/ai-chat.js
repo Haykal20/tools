@@ -50,8 +50,16 @@ function initAiChat() {
     }
 
     function parseMarkdown(text) {
+        // Escape HTML characters first to prevent unwanted HTML rendering
+        const escapedText = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        
         // Convert **text** to bold
-        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return escapedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
     async function handleFormSubmit(e) {
