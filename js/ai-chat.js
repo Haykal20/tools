@@ -49,6 +49,11 @@ function initAiChat() {
         confirmationModal.style.display = 'none';
     }
 
+    function parseMarkdown(text) {
+        // Convert **text** to bold
+        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
     async function handleFormSubmit(e) {
         e.preventDefault();
         const userMessage = userInput.value.trim();
@@ -92,17 +97,21 @@ function initAiChat() {
         msgWrapper.className = 'flex items-start gap-3';
         msgContent.className = 'rounded-lg p-3 max-w-lg shadow';
         msgContent.style.whiteSpace = 'pre-wrap';
-        msgContent.textContent = text;
+        
         if (sender === 'user') {
+            msgContent.textContent = text;
             msgWrapper.classList.add('justify-end');
             msgContent.classList.add('bg-teal-600', 'text-white');
             iconDiv.innerHTML = `<i data-lucide="user" class="text-white"></i>`;
             msgWrapper.append(msgContent, iconDiv);
         } else {
+            // Parse markdown for AI responses
+            msgContent.innerHTML = parseMarkdown(text);
             msgContent.classList.add(isError ? 'bg-red-800' : 'bg-gray-800');
             iconDiv.innerHTML = `<i data-lucide="bot" class="text-teal-400"></i>`;
             msgWrapper.append(iconDiv, msgContent);
         }
+        
         chatContainer.appendChild(msgWrapper);
         lucide.createIcons();
         scrollToBottom();
