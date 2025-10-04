@@ -1,18 +1,45 @@
 <div id="diagram-tool-view" class="min-h-screen tool-body p-4">
-    <div class="w-full max-w-7xl mx-auto flex flex-col">
-        <div class="mb-4">
+    <div class="w-full max-w-7xl mx-auto flex flex-col h-[95vh]">
+        
+        <div class="mb-4 flex items-center justify-between flex-shrink-0">
              <button class="back-to-selection-btn flex items-center gap-2 text-slate-300 hover:text-white transition">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
             </button>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center bg-slate-700 rounded-full p-1 shadow-inner">
+                    <button id="editModeBtn" class="px-3 py-1 text-sm font-medium rounded-full text-white bg-orange-600 transition-all">Edit</button>
+                    <button id="viewModeBtn" class="px-3 py-1 text-sm font-medium rounded-full text-slate-300 hover:text-white hover:bg-slate-600 transition-all">View</button>
+                </div>
+                <div class="flex items-center">
+                    <span id="themeLabel" class="text-sm font-medium text-slate-400 mr-2">Gelap</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
         </div>
        
-        <div class="flex-grow grid md:grid-cols-2 gap-6">
-            <div class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div id="editorContainer" class="flex-grow">
+            <div id="editorPanel" class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full">
                 <div class="p-4 bg-slate-900/50 border-b border-slate-700 text-slate-200 font-semibold flex items-center gap-2">
                     <i data-lucide="file-code-2" class="w-5 h-5 text-orange-400"></i>
                     <span>Kode Mermaid</span>
                 </div>
                 <textarea id="editor" class="flex-grow w-full p-4 bg-slate-800/50 text-slate-200 border-none resize-none font-mono text-sm leading-relaxed focus:outline-none" placeholder="Tulis kode Mermaid di sini..."></textarea>
+                <div class="p-4 border-t border-slate-700 bg-slate-800/50">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Contoh Diagram</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="insertSample('flowchart')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">Flowchart</button>
+                        <button onclick="insertSample('sequence')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">Sequence</button>
+                        <button onclick="insertSample('class')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">Class</button>
+                        <button onclick="insertSample('state')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">State</button>
+                        <button onclick="insertSample('er')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">ER</button>
+                        <button onclick="insertSample('gantt')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">Gantt</button>
+                        <button onclick="insertSample('pie')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">Pie</button>
+                        <button onclick="insertSample('mindmap')" class="text-xs font-semibold text-slate-200 bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded-full">Mindmap</button>
+                    </div>
+                </div>
                 <div class="p-4 border-t border-slate-700 bg-slate-900/50">
                      <div class="grid grid-cols-3 gap-3">
                         <button onclick="pasteFromClipboard()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2"><i data-lucide="clipboard-paste" class="w-4 h-4"></i><span>Tempel</span></button>
@@ -21,13 +48,15 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-                <div class="p-4 bg-slate-900/50 border-b border-slate-700 text-slate-200 font-semibold flex items-center gap-2">
-                    <i data-lucide="image" class="w-5 h-5 text-orange-400"></i>
-                    <span>Preview Diagram</span>
+        <div id="viewContainer" class="flex-grow hidden">
+            <div class="tool-card rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full">
+                <div class="p-4 bg-slate-900/50 border-b border-slate-700 text-slate-200 font-semibold flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2"><i data-lucide="monitor" class="w-5 h-5 text-orange-400"></i><span>Tampilan Diagram</span></div>
+                    <button onclick="downloadSVG()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-2 text-sm"><i data-lucide="download" class="w-4 h-4"></i><span>Unduh SVG</span></button>
                 </div>
-                <div id="preview" class="flex-grow p-5 flex items-center justify-center bg-slate-800/50 min-h-[300px] md:min-h-0">
+                <div id="fullViewPreview" class="flex-grow p-5 flex items-center justify-center bg-slate-800/50">
                     <p class="text-slate-500">Diagram akan muncul di sini...</p>
                 </div>
             </div>
