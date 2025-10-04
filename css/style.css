@@ -1,42 +1,119 @@
-/* General Body Style */
+/* --- GAYA GLOBAL & DASAR --- */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #0f172a; /* Slate 900 */
     touch-action: manipulation;
+    overflow-x: hidden;
 }
 
-/* Custom Scrollbar for AI Chat */
+* {
+    /* Menghilangkan highlight biru saat disentuh di mobile */
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tool-body {
+     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+.tool-card {
+     background: rgba(30, 41, 59, 0.5); /* Slate 800 with transparency */
+     backdrop-filter: blur(10px);
+     border: 1px solid rgba(51, 65, 85, 0.5); /* Slate 700 with transparency */
+}
+
+/* Animasi fade-in untuk view */
+.view-enter {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* --- GAYA UNTUK AI CHAT --- */
+
+/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; } /* Slate 800 */
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; } /* Slate 600 */
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; } /* Slate 500 */
 
-/* AI Chat Typing Indicator */
-.dot-flashing {
-    position: relative; width: 10px; height: 10px;
-    border-radius: 5px; background-color: #9ca3af;
-    color: #9ca3af; animation: dotFlashing 1s infinite linear alternate;
-    animation-delay: .5s;
+/* Indikator "AI sedang mengetik..." yang posisinya tetap */
+.chat-loading-fixed {
+    position: fixed;
+    bottom: 90px; /* Disesuaikan agar pas di atas footer input */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+    z-index: 10;
+    pointer-events: none;
 }
-.dot-flashing::before, .dot-flashing::after {
-    content: ''; display: inline-block; position: absolute; top: 0;
-}
-.dot-flashing::before {
-    left: -15px; width: 10px; height: 10px; border-radius: 5px;
-    background-color: #9ca3af; color: #9ca3af;
-    animation: dotFlashing 1s infinite alternate; animation-delay: 0s;
-}
-.dot-flashing::after {
-    left: 15px; width: 10px; height: 10px; border-radius: 5px;
-    background-color: #9ca3af; color: #9ca3af;
-    animation: dotFlashing 1s infinite alternate; animation-delay: 1s;
-}
-@keyframes dotFlashing {
-    0% { background-color: #9ca3af; }
-    50%, 100% { background-color: #4b5563; }
+.chat-loading-fixed > div {
+    pointer-events: auto;
 }
 
-/* TikTok Downloader Styles */
+/* Animasi typing dot yang modern */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+}
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background-color: #9ca3af;
+    border-radius: 50%;
+    animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing-bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+/* Styling untuk blok kode dari AI */
+pre {
+    position: relative;
+    background-color: #111827; /* gray-900 */
+    color: #d1d5db; /* gray-300 */
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    margin: 0.5rem 0;
+    border: 1px solid #374155; /* gray-700 */
+}
+pre code {
+    white-space: pre;
+    word-wrap: normal;
+}
+.copy-code-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #4b5563; /* gray-600 */
+    color: #e5e7eb; /* gray-200 */
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0.2;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+pre:hover .copy-code-btn {
+    opacity: 1;
+}
+.copy-code-btn:hover {
+    background-color: #6b7280; /* gray-500 */
+}
+
+
+/* --- GAYA UNTUK TIKTOK DOWNLOADER --- */
 .tiktok-tool-body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -60,26 +137,7 @@ body {
 #tiktok-result { transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; opacity: 0; transform: translateY(20px); pointer-events: none; }
 #tiktok-result.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-/* General Tool Styles */
-.tool-body {
-     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-}
-.tool-card {
-     background: rgba(30, 41, 59, 0.5); /* Slate 800 with transparency */
-     backdrop-filter: blur(10px);
-     border: 1px solid rgba(51, 65, 85, 0.5); /* Slate 700 with transparency */
-}
-
-/* Fade-in animation for views */
-.view-enter {
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-}
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-/* Tensor AI Detector Styles */
+/* --- GAYA UNTUK TENSOR DETECTOR & OCR --- */
 .loader {
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
@@ -92,75 +150,52 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+.drop-area-base {
+    border: 3px dashed #475569;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.drop-area-highlight {
+    border-color: #f59e0b; /* Amber 500 */
+    background-color: rgba(51, 65, 85, 0.5); /* Slate 700 with transparency */
+}
+.result-box {
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
 
-/* --- PDF MERGER STYLES --- */
+
+/* --- GAYA UNTUK PDF MERGER --- */
 .drop-area {
-    border: 3px dashed #475569; /* Slate 600 */
+    border: 3px dashed #475569;
     border-radius: 12px;
     padding: 40px 20px;
     text-align: center;
     margin: 20px 0;
     cursor: pointer;
-    background: rgba(15, 23, 42, 0.5); /* Slate 900 with transparency */
+    background: rgba(15, 23, 42, 0.5);
     transition: all 0.3s;
 }
 .drop-area:hover, .drop-area.dragover {
-    background: rgba(30, 41, 59, 0.5); /* Slate 800 with transparency */
-    border-color: #38bdf8; /* Sky 400 */
+    background: rgba(30, 41, 59, 0.5);
+    border-color: #38bdf8;
 }
 .drop-area .icon-lucide {
-    font-size: 60px;
-    color: #38bdf8; /* Sky 400 */
-    display: block;
-    margin-bottom: 15px;
-    width: 60px; /* Lucide needs explicit size */
-    height: 60px;
     stroke-width: 1.5;
     margin-left: auto;
     margin-right: auto;
-}
-#fileInput {
-    display: none;
-}
-.btn {
-    background: #38bdf8; /* Sky 400 */
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    font-weight: bold;
-    transition: background 0.3s;
-    width: 100%;
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.btn:hover:not(:disabled) {
-    background: #0ea5e9; /* Sky 500 */
-}
-.btn:disabled {
-    background: #475569; /* Slate 600 */
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-#preview-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 20px;
-    min-height: 50px;
-    padding-bottom: 20px;
+    margin-bottom: 15px;
 }
 .preview-item {
     position: relative;
     width: 150px;
-    border: 1px solid #334155; /* Slate 700 */
+    border: 1px solid #334155;
     border-radius: 8px;
     overflow: hidden;
-    background-color: #1e293b; /* Slate 800 */
+    background-color: #1e293b;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     cursor: move;
 }
@@ -198,36 +233,24 @@ body {
     justify-content: center;
     transition: background 0.2s;
 }
-.preview-item .remove:hover {
-    background: #c0392b;
-}
+.preview-item .remove:hover { background: #c0392b; }
 .success { color: #27ae60; }
 .error { color: #e74c3c; }
 .info { color: #3498db; }
 
-/* Animasi */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.preview-item {
-    animation: fadeIn 0.3s ease-out;
-}
 
-/* Gaya untuk Toggle Switch */
+/* --- GAYA UNTUK DIAGRAM EDITOR --- */
 .switch {
   position: relative;
   display: inline-block;
   width: 40px;
   height: 24px;
 }
-
 .switch input { 
   opacity: 0;
   width: 0;
   height: 0;
 }
-
 .slider {
   position: absolute;
   cursor: pointer;
@@ -235,11 +258,9 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #4A5568; /* bg-slate-600 */
-  -webkit-transition: .4s;
+  background-color: #4A5568;
   transition: .4s;
 }
-
 .slider:before {
   position: absolute;
   content: "";
@@ -248,149 +269,19 @@ body {
   left: 4px;
   bottom: 4px;
   background-color: white;
-  -webkit-transition: .4s;
   transition: .4s;
 }
+input:checked + .slider { background-color: #2563EB; }
+input:focus + .slider { box-shadow: 0 0 1px #2563EB; }
+input:checked + .slider:before { transform: translateX(16px); }
+.slider.round { border-radius: 24px; }
+.slider.round:before { border-radius: 50%; }
 
-input:checked + .slider {
-  background-color: #2563EB; /* bg-blue-600 */
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2563EB;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(16px);
-  -ms-transform: translateX(16px);
-  transform: translateX(16px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 24px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-/* Untuk Loading Spinner di Diagram Editor */
 .loader-mermaid {
-  border: 4px solid #f3f3f3; /* Light grey */
-  border-top: 4px solid #fb923c; /* Orange-400 */
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #fb923c;
   border-radius: 50%;
   width: 30px;
   height: 30px;
   animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.ai-message-content strong {
- font-weight: 600;
-color: #f3f4f6;
-}
-
-.ai-message-content p {
-margin-bottom: 0.5rem;
-}
-
-.ai-message-content p:last-child {
-margin-bottom: 0;
-}
-
-.typing-indicator {
-display: flex;
-align-items: center;
-gap: 8px;
-padding: 12px 16px;
-}
-
-.typing-dot {
-width: 6px;
-height: 6px;
-background-color: #9ca3af;
-border-radius: 50%;
-animation: typingAnimation 1.4s infinite ease-in-out;
-}
-
-.typing-dot:nth-child(1) { animation-delay: 0s; }
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typingAnimation {
-0%, 60%, 100% { transform: translateY(0); }
-30% { transform: translateY(-4px); }
-}
-
-.ai-message-content code {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    background-color: #374151;
-    padding: 0.2em 0.4em;
-    border-radius: 3px;
-    font-size: 0.9em;
-    color: #e5e7eb;
-    word-break: break-word;
-    white-space: pre-wrap;
-}
-
-.ai-message-content pre {
-    background-color: #1f2937;
-    padding: 1em;
-    border-radius: 6px;
-    overflow-x: auto;
-    margin: 0.5rem 0;
-    border-left: 4px solid #3b82f6;
-    max-width: 100%;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-}
-
-.ai-message-content pre code {
-    background: none;
-    padding: 0;
-    border-radius: 0;
-    color: #e5e7eb;
-    font-size: 0.85em;
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-
-/* Syntax highlighting for common code elements */
-.ai-message-content .hljs-keyword { color: #f87171; }
-.ai-message-content .hljs-string { color: #86efac; }
-.ai-message-content .hljs-comment { color: #9ca3af; }
-.ai-message-content .hljs-function { color: #93c5fd; }
-.ai-message-content .hljs-number { color: #fbbf24; }
-.ai-message-content .hljs-tag { color: #7dd3fc; }
-.ai-message-content .hljs-attr { color: #c7d2fe; }
-
-/* Loading indicator fixed (chat typing) */
-.chat-loading-fixed {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 88px; /* di atas footer */
-    display: flex;
-    justify-content: center;
-    z-index: 40;
-    pointer-events: none; /* biarkan klik menerus ke elemen bawah, inner tetap clickable jika perlu */
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-/* Inner indicator aktif harus bisa menerima pointer events */
-.chat-loading-fixed .pointer-events-auto { pointer-events: auto; }
-
-/* Mobile adjustments: beri lebih lebar pesan untuk layar kecil */
-@media (max-width: 640px) {
-    .ai-message-content pre, .ai-message-content code {
-        font-size: 0.9rem;
-    }
-    /* chat message max width handled inline, tetapi tambahan safety: */
-    .chat- message { max-width: 90%; }
 }

@@ -1,256 +1,211 @@
 // js/ai-chat.js
 
 function initAiChat() {
+    // Pastikan library tambahan sudah dimuat
+    if (typeof marked === 'undefined' || typeof hljs === 'undefined') {
+        console.error("Marked.js atau Highlight.js belum dimuat. Fitur formatting tidak akan berjalan.");
+    }
+
     const API_URL = "https://restless-fire-59dc.thehaykal219.workers.dev";
     const chatContainer = document.getElementById('chat-container');
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
     const loadingIndicator = document.getElementById('loading-indicator');
-    const submitButton = chatForm ? chatForm.querySelector('button') : null;
+    const submitButton = chatForm?.querySelector('button');
     const modelSelector = document.getElementById('model-selector');
-    const confirmationModal = document.getElementById('confirmation-modal');
+    
+    // Modal Ganti Model
+    const modelChangeModal = document.getElementById('model-change-modal');
     const confirmChangeBtn = document.getElementById('confirm-change-btn');
     const cancelChangeBtn = document.getElementById('cancel-change-btn');
-    const clearChatBtn = document.getElementById('clear-chat-btn'); // optional
+    
+    // Tombol dan Modal Hapus Chat
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+    const clearChatModal = document.getElementById('clear-chat-modal');
+    const confirmClearBtn = document.getElementById('confirm-clear-btn');
+    const cancelClearBtn = document.getElementById('cancel-clear-btn');
 
-    // Minimal required elements
     if (!chatContainer || !chatForm) return;
 
     let messages = [];
-    let currentModel = modelSelector ? modelSelector.value : '';
-    let isFirstMessage = true;
+    let currentModel = modelSelector?.value || '';
 
-    // Load messages from localStorage
+    // --- Manajemen Riwayat Chat ---
     function loadMessages() {
         const savedMessages = localStorage.getItem('aiChatMessages');
         const savedModel = localStorage.getItem('aiChatModel');
-        
         if (savedMessages) {
             messages = JSON.parse(savedMessages);
-            renderSavedMessages();
-            isFirstMessage = messages.length === 0;
+            renderAllMessages();
         }
-        
         if (savedModel && modelSelector) {
             modelSelector.value = savedModel;
             currentModel = savedModel;
         }
-    }
-
-    // Save messages to localStorage
-    function saveMessages() {
-        // limit stored messages to avoid localStorage ballooning
-        const toSave = messages.slice(-200);
-        localStorage.setItem('aiChatMessages', JSON.stringify(toSave));
-        if (modelSelector) localStorage.setItem('aiChatModel', modelSelector.value);
-    }
-
-    // Render saved messages
-    function renderSavedMessages() {
-        chatContainer.innerHTML = '';
-        messages.forEach(msg => {
-            if (msg.role === 'system') {
-                appendSystemMessage(msg.content);
-            } else if (msg.role === 'user') {
-                appendMessage('user', msg.content);
-            } else if (msg.role === 'assistant') {
-                appendMessage('assistant', msg.content);
-            }
-        });
-        // Rendered from storage — scroll to bottom so user sees latest on open
-        scrollToBottom();
-    }
-
-    // Clear chat history
-    function clearChatHistory() {
-        const confirmClear = confirm('Apakah Anda yakin ingin menghapus semua riwayat chat?');
-        if (confirmClear) {
-            messages = [];
-            chatContainer.innerHTML = '';
-            localStorage.removeItem('aiChatMessages');
-            localStorage.removeItem('aiChatModel');
-            
-            // Add welcome message
+        if (messages.length === 0) {
             appendSystemMessage('Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!');
             messages.push({ role: 'system', content: 'Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!' });
-            isFirstMessage = false;
         }
     }
 
-    chatForm.addEventListener('submit', handleFormSubmit);
-    if (modelSelector) modelSelector.addEventListener('change', handleModelChange);
-    if (confirmChangeBtn) confirmChangeBtn.addEventListener('click', confirmModelChange);
-    if (cancelChangeBtn) cancelChangeBtn.addEventListener('click', cancelModelChange);
-    if (clearChatBtn) clearChatBtn.addEventListener('click', clearChatHistory);
+    function saveMessages() {
+        localStorage.setItem('aiChatMessages', JSON.stringify(messages.slice(-50))); // Simpan 50 pesan terakhir
+        if (modelSelector) localStorage.setItem('aiChatModel', modelSelector.value);
+    }
 
-    // Load messages on init
-    loadMessages();
-
-    if (isFirstMessage) {
-        appendSystemMessage('Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!');
-        messages.push({ role: 'system', content: 'Halo! Saya Haykal AI. Silakan ajukan pertanyaan apa pun!' });
-        isFirstMessage = false;
+    function renderAllMessages() {
+        chatContainer.innerHTML = '';
+        messages.forEach(msg => {
+            if (msg.role === 'system') appendSystemMessage(msg.content);
+            else appendMessage(msg.role, msg.content, msg.isError || false, false);
+        });
+        scrollToBottom();
+    }
+    
+    // --- Logika Tombol Header ---
+    clearChatBtn?.addEventListener('click', () => clearChatModal?.classList.remove('hidden'));
+    cancelClearBtn?.addEventListener('click', () => clearChatModal?.classList.add('hidden'));
+    confirmClearBtn?.addEventListener('click', () => {
+        messages = [];
+        chatContainer.innerHTML = '';
+        localStorage.removeItem('aiChatMessages');
+        appendSystemMessage('Riwayat percakapan dihapus.');
+        messages.push({ role: 'system', content: 'Riwayat percakapan dihapus.' });
         saveMessages();
-    }
+        clearChatModal?.classList.add('hidden');
+    });
 
-    function handleModelChange() {
-        if (messages.length === 0) { confirmModelChange(); return; }
-        confirmationModal.style.display = 'flex';
-    }
-
-    function confirmModelChange() {
+    modelSelector?.addEventListener('change', () => {
+        if (messages.length > 1) modelChangeModal?.classList.remove('hidden');
+        else confirmModelChange();
+    });
+    cancelChangeBtn?.addEventListener('click', () => {
+        if (modelSelector) modelSelector.value = currentModel;
+        modelChangeModal?.classList.add('hidden');
+    });
+    confirmChangeBtn?.addEventListener('click', () => {
         messages = [];
         chatContainer.innerHTML = '';
         const modelName = modelSelector.options[modelSelector.selectedIndex].text;
         appendSystemMessage(`Model diubah ke ${modelName}. Percakapan dimulai ulang.`);
         messages.push({ role: 'system', content: `Model diubah ke ${modelName}. Percakapan dimulai ulang.` });
-        userInput.focus();
         if (modelSelector) currentModel = modelSelector.value;
-        confirmationModal.style.display = 'none';
-        saveMessages(); // Save after model change
-    }
-
-    function cancelModelChange() {
-        if (modelSelector) modelSelector.value = currentModel;
-        confirmationModal.style.display = 'none';
-    }
-
-    function parseMarkdown(text) {
-        // Handle code blocks separately
-        const codeBlockRegex = /```([\s\S]*?)```/g;
-        const inlineCodeRegex = /`([^`]+)`/g;
-        
-        // First, extract and preserve code blocks
-        const codeBlocks = [];
-        let processedText = text.replace(codeBlockRegex, (match, codeContent) => {
-            codeBlocks.push(codeContent);
-            return `\uE000${codeBlocks.length - 1}\uE001`;
-        });
-        
-        // Then, extract and preserve inline code
-        const inlineCodes = [];
-        processedText = processedText.replace(inlineCodeRegex, (match, codeContent) => {
-            inlineCodes.push(codeContent);
-            return `\uE002${inlineCodes.length - 1}\uE003`;
-        });
-        
-        // Escape HTML in the remaining text (but not in the preserved code blocks)
-        processedText = processedText
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-        
-        // Convert **text** to bold
-        processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Restore code blocks with proper formatting
-        processedText = processedText.replace(/\uE000(\d+)\uE001/g, (match, index) => {
-            const code = codeBlocks[index];
-            return `<pre><code>${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
-        });
-        
-        // Restore inline code
-        processedText = processedText.replace(/\uE002(\d+)\uE003/g, (match, index) => {
-            const code = inlineCodes[index];
-            return `<code>${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`;
-        });
-        
-        return processedText;
-    }
+        saveMessages();
+        modelChangeModal?.classList.add('hidden');
+        userInput.focus();
+    });
+    
+    // --- Pengiriman Pesan ---
+    chatForm.addEventListener('submit', handleFormSubmit);
 
     async function handleFormSubmit(e) {
         e.preventDefault();
         const userMessage = userInput.value.trim();
         if (!userMessage) return;
+        
         appendMessage('user', userMessage);
         messages.push({ role: 'user', content: userMessage });
-        saveMessages(); // Save after user message
+        saveMessages();
         userInput.value = '';
         setFormDisabled(true);
-        loadingIndicator.classList.remove('hidden'); // show typing indicator (now fixed)
-        // jangan paksa scroll ke bottom di sini — appendMessage akan handle auto-scroll sesuai posisi user
+        loadingIndicator?.classList.remove('hidden');
+
         try {
-            const aiResponse = await getAIResponse(modelSelector ? modelSelector.value : currentModel);
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: currentModel, messages })
+            });
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
+
             appendMessage('assistant', aiResponse);
             messages.push({ role: 'assistant', content: aiResponse });
-            saveMessages(); // Save after AI response
+            saveMessages();
         } catch (error) {
             console.error("Error:", error);
-            appendMessage('assistant', "Maaf, terjadi kesalahan. Coba lagi.", true);
-            messages.push({ role: 'assistant', content: "Maaf, terjadi kesalahan. Coba lagi.", isError: true });
-            saveMessages(); // Save even on error
+            appendMessage('assistant', "Maaf, terjadi kesalahan. Silakan coba lagi.", true);
         } finally {
-            loadingIndicator.classList.add('hidden');
+            loadingIndicator?.classList.add('hidden');
             setFormDisabled(false);
         }
     }
-
-    async function getAIResponse(model) {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model, messages })
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`API Error: ${response.status} - ${errorData.error}`);
-        }
-        const data = await response.json();
-        return data.choices[0].message.content;
-    }
-
-    // Tambahkan helper untuk cek apakah user berada dekat bottom
+    
     function isUserNearBottom(threshold = 120) {
-        if (!chatContainer) return true;
         return (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight) < threshold;
     }
 
-    function appendMessage(sender, text, isError = false) {
-        const msgWrapper = document.createElement('div'), msgContent = document.createElement('div'), iconDiv = document.createElement('div');
-        iconDiv.className = 'bg-gray-700 p-2 rounded-full self-start';
-        msgWrapper.className = 'flex items-start gap-3';
-        msgContent.className = 'rounded-lg p-3 max-w-lg shadow';
-
-        // Cek apakah user sedang dekat bottom sebelum append
+    function appendMessage(sender, text, isError = false, shouldSave = true) {
         const shouldScroll = isUserNearBottom();
 
-        // Limit visual overflow and keep formatting (lebih ramah mobile)
-        msgContent.style.whiteSpace = 'pre-wrap';
+        const msgWrapper = document.createElement('div');
+        msgWrapper.className = 'flex items-start gap-3';
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'bg-gray-700 p-2 rounded-full self-start';
+        
+        const msgContent = document.createElement('div');
+        msgContent.className = 'rounded-lg p-3 max-w-lg shadow';
         msgContent.style.overflowWrap = 'break-word';
-        msgContent.style.wordBreak = 'break-word';
-        msgContent.style.boxSizing = 'border-box';
-        msgContent.style.maxWidth = 'min(70ch, 85%)'; // ubah jadi 85% agar mobile tidak terlalu ke kanan
 
         if (sender === 'user') {
-            msgContent.textContent = text;
             msgWrapper.classList.add('justify-end');
-            msgContent.classList.add('bg-teal-600', 'text-white');
             iconDiv.innerHTML = `<i data-lucide="user" class="text-white"></i>`;
+            msgContent.textContent = text;
+            msgContent.classList.add('bg-teal-600', 'text-white');
             msgWrapper.append(msgContent, iconDiv);
-        } else {
-            // Parse markdown for AI responses
-            msgContent.innerHTML = parseMarkdown(text);
-            msgContent.classList.add(isError ? 'bg-red-800' : 'bg-gray-800');
+        } else { // assistant
             iconDiv.innerHTML = `<i data-lucide="bot" class="text-teal-400"></i>`;
+            msgContent.classList.add(isError ? 'bg-red-800' : 'bg-gray-800', 'text-gray-200');
+            // Gunakan Marked.js untuk parsing
+            if (typeof marked !== 'undefined' && !isError) {
+                msgContent.innerHTML = marked.parse(text);
+            } else {
+                msgContent.textContent = text;
+            }
             msgWrapper.append(iconDiv, msgContent);
         }
 
         chatContainer.appendChild(msgWrapper);
-        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') lucide.createIcons();
+        lucide.createIcons();
+        
+        // Setelah di-append, cari blok kode dan tambahkan highlight + tombol copy
+        msgContent.querySelectorAll('pre code').forEach(addSyntaxHighlightingAndCopy);
 
-        // Hanya scroll jika user sebelumnya sudah berada di bottom / near bottom
         if (shouldScroll) scrollToBottom();
+    }
+
+    function addSyntaxHighlightingAndCopy(block) {
+        // Terapkan highlighting
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightElement(block);
+        }
+        
+        // Buat dan tambahkan tombol copy
+        const pre = block.parentElement;
+        if (pre.querySelector('.copy-code-btn')) return; // Hindari duplikat tombol
+
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-code-btn';
+        copyButton.textContent = 'Copy';
+        pre.appendChild(copyButton);
+
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(block.textContent).then(() => {
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => { copyButton.textContent = 'Copy'; }, 2000);
+            }).catch(err => {
+                console.error('Gagal menyalin kode:', err);
+                copyButton.textContent = 'Error';
+            });
+        });
     }
 
     function appendSystemMessage(text) {
          const wrapper = document.createElement('div');
          wrapper.className = 'text-center my-2';
-         const content = document.createElement('div');
-         content.className = 'inline-block bg-gray-700 text-gray-400 text-xs px-3 py-1 rounded-full';
-         content.textContent = text;
-         wrapper.appendChild(content);
+         wrapper.innerHTML = `<div class="inline-block bg-gray-700 text-gray-400 text-xs px-3 py-1 rounded-full">${text}</div>`;
          chatContainer.appendChild(wrapper);
          scrollToBottom();
     }
@@ -259,8 +214,11 @@ function initAiChat() {
 
     function setFormDisabled(isDisabled) {
         userInput.disabled = isDisabled;
-        if (submitButton) submitButton.disabled = isDisabled;
+        submitButton.disabled = isDisabled;
         userInput.placeholder = isDisabled ? "AI sedang berpikir..." : "Ketik pesan Anda di sini...";
         if (!isDisabled) userInput.focus();
     }
+
+    // --- Inisialisasi ---
+    loadMessages();
 }
