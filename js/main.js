@@ -2,10 +2,7 @@
 
 // Saat halaman pertama kali dimuat
 document.addEventListener('DOMContentLoaded', () => {
-    // Cek apakah ada "hash" di URL (contoh: #tensor-chooser)
     const hash = window.location.hash.substring(1);
-    
-    // Jika ada hash, langsung muat view tersebut. Jika tidak, muat menu utama.
     if (hash) {
         loadView(hash);
     } else {
@@ -25,12 +22,18 @@ async function loadView(viewName) {
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
         
-        // Memanggil fungsi inisialisasi yang sesuai
+        // Atur URL hash tanpa membuat history baru (baik untuk navigasi SPA)
+        if (viewName === 'tool-selection') {
+            history.replaceState(null, '', window.location.pathname);
+        } else {
+            history.replaceState(null, '', `#${viewName}`);
+        }
+
         switch (viewName) {
             case 'tool-selection':
                 initToolSelectionListeners();
                 break;
-            // Alat non-AI
+            // Alat non-AI (tanpa refresh)
             case 'ai-chat': initAiChat(); initBackButtonListener(); break;
             case 'tiktok-downloader': initTikTokDownloader(); initBackButtonListener(); break;
             case 'number-converter': initNumberConverter(); initBackButtonListener(); break;
@@ -38,9 +41,9 @@ async function loadView(viewName) {
             case 'pdf-merger': initPdfMerger(); initBackButtonListener(); break;
             case 'qrcode-generator': initQrCodeGenerator(); initBackButtonListener(); break;
             case 'diagram-editor': initDiagramEditor(); initBackButtonListener(); break;
-
-            // Alat AI
             case 'text-extractor': await initTextExtractor(); initBackButtonListener(); break;
+            
+            // Alat AI (dipanggil setelah refresh)
             case 'tensor-chooser': initTensorChooserListeners(); initBackButtonListener(); break;
             case 'tensor-camera': await initTensorCamera(); initBackButtonListener(); break;
             case 'tensor-image': await initTensorImage(); initBackButtonListener(); break;
@@ -48,10 +51,12 @@ async function loadView(viewName) {
         }
     } catch (error) {
         console.error('Error loading view:', error);
+        document.getElementById('app-container').innerHTML = `<div class="text-center p-8 text-red-400"><h2>Terjadi Kesalahan</h2><p>${error.message}</p><button onclick="window.location.href=window.location.pathname" class="mt-4 bg-slate-700 p-2 px-4 rounded-lg">Kembali ke Menu Utama</button></div>`;
     }
 }
 
 function initToolSelectionListeners() {
+    // Alat standar yang menggunakan navigasi SPA (tanpa refresh)
     const standardTools = {
         'select-ai-chat': 'ai-chat',
         'select-tiktok-dl': 'tiktok-downloader',
@@ -67,7 +72,7 @@ function initToolSelectionListeners() {
         document.getElementById(id)?.addEventListener('click', () => loadView(view));
     });
 
-    // --- LOGIKA DIPERBAIKI DI SINI ---
+    // --- LOGIKA KHUSUS UNTUK ALAT AI YANG BERKONFLIK (DENGAN REFRESH) ---
     const conflictingAiTools = {
         'select-tensor-ai': 'tensor-chooser',
         'select-face-recognition': 'face-recognition'
@@ -75,7 +80,7 @@ function initToolSelectionListeners() {
 
     Object.entries(conflictingAiTools).forEach(([id, view]) => {
         document.getElementById(id)?.addEventListener('click', () => {
-            // Langsung set hash DAN reload pada klik pertama
+            // Logika dari sebelumnya: set hash DAN reload halaman untuk memastikan 'clean state'
             window.location.hash = view;
             window.location.reload();
         });
@@ -88,18 +93,24 @@ function initTensorChooserListeners() {
 }
 
 function initBackButtonListener() {
+    // --- Kembali ke menu utama dengan me-refresh halaman ---
     document.querySelectorAll('.back-to-selection-btn').forEach(btn => {
         btn.addEventListener('click', (event) => {
             event.preventDefault();
-            // Kembali ke menu utama dengan membersihkan hash dan reload
+            // Menghentikan stream kamera jika ada sebelum navigasi
+            if (typeof window.stopTensorCameraStream === 'function') {
+                window.stopTensorCameraStream();
+            }
+            // Navigasi ke halaman utama (membersihkan hash dan me-refresh)
             window.location.href = window.location.pathname;
         });
     });
 
+    // Kembali ke halaman pilihan tensor (tanpa refresh)
     document.querySelectorAll('.back-to-chooser-btn').forEach(btn => {
         btn.addEventListener('click', (event) => {
             event.preventDefault();
-            loadView('tensor-chooser'); // Kembali ke halaman pilihan tensor (tanpa reload)
+            loadView('tensor-chooser'); 
         });
     });
 }
