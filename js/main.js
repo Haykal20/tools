@@ -66,6 +66,10 @@ async function loadView(viewName) {
                 initTextExtractor();
                 initBackButtonListener();
                 break;
+             case 'face-recognition':
+                initFaceRecognition();
+                initBackButtonListener();
+                break;
             default:
                 console.warn(`Tidak ada inisialisasi untuk view: ${viewName}`);
         }
@@ -97,6 +101,7 @@ function initToolSelectionListeners() {
         'select-qrcode-generator': 'qrcode-generator',
         'select-diagram-editor': 'diagram-editor',
         'select-text-extractor': 'text-extractor'
+        'select-face-recognition': 'face-recognition'
     };
 
     Object.entries(tools).forEach(([id, view]) => {
