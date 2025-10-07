@@ -1,7 +1,16 @@
 // js/main.js
 
+// Saat halaman pertama kali dimuat
 document.addEventListener('DOMContentLoaded', () => {
-    loadView('tool-selection');
+    // Cek apakah ada "hash" di URL (contoh: #tensor-chooser)
+    const hash = window.location.hash.substring(1);
+    
+    // Jika ada hash, langsung muat view tersebut. Jika tidak, muat menu utama.
+    if (hash) {
+        loadView(hash);
+    } else {
+        loadView('tool-selection');
+    }
 });
 
 async function loadView(viewName) {
@@ -10,10 +19,9 @@ async function loadView(viewName) {
         if (!response.ok) throw new Error(`Gagal memuat view: ${viewName}.html`);
         
         const html = await response.text();
-        const appContainer = document.getElementById('app-container');
-        appContainer.innerHTML = html;
-        if (appContainer.firstElementChild) {
-            appContainer.firstElementChild.classList.add('view-enter');
+        document.getElementById('app-container').innerHTML = html;
+        if (document.getElementById('app-container').firstElementChild) {
+            document.getElementById('app-container').firstElementChild.classList.add('view-enter');
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
         
@@ -22,142 +30,91 @@ async function loadView(viewName) {
             case 'tool-selection':
                 initToolSelectionListeners();
                 break;
-            case 'ai-chat':
-                initAiChat();
-                initBackButtonListener();
-                break;
-            case 'tiktok-downloader':
-                initTikTokDownloader();
-                initBackButtonListener();
-                break;
-            case 'number-converter':
-                initNumberConverter();
-                initBackButtonListener();
-                break;
-            case 'password-generator':
-                initPasswordGenerator();
-                initBackButtonListener();
-                break;
-            case 'pdf-merger':
-                initPdfMerger();
-                initBackButtonListener();
-                break;
-            case 'tensor-chooser':
-                initTensorChooserListeners();
-                initBackButtonListener();
-                break;
-            case 'tensor-camera':
-                initTensorCamera();
-                initBackButtonListener();
-                break;
-            case 'tensor-image':
-                initTensorImage();
-                initBackButtonListener();
-                break;
-            case 'qrcode-generator':
-                initQrCodeGenerator();
-                initBackButtonListener();
-                break;
-            case 'diagram-editor':
-                initDiagramEditor();
-                initBackButtonListener();
-                break;
-            case 'text-extractor':
-                initTextExtractor();
-                initBackButtonListener();
-                break;
-             case 'face-recognition':
-                initFaceRecognition();
-                initBackButtonListener();
-                break;
-            default:
-                console.warn(`Tidak ada inisialisasi untuk view: ${viewName}`);
+            // Alat non-AI
+            case 'ai-chat': initAiChat(); initBackButtonListener(); break;
+            case 'tiktok-downloader': initTikTokDownloader(); initBackButtonListener(); break;
+            case 'number-converter': initNumberConverter(); initBackButtonListener(); break;
+            case 'password-generator': initPasswordGenerator(); initBackButtonListener(); break;
+            case 'pdf-merger': initPdfMerger(); initBackButtonListener(); break;
+            case 'qrcode-generator': initQrCodeGenerator(); initBackButtonListener(); break;
+            case 'diagram-editor': initDiagramEditor(); initBackButtonListener(); break;
+
+            // Alat AI
+            case 'text-extractor': await initTextExtractor(); initBackButtonListener(); break;
+            case 'tensor-chooser': initTensorChooserListeners(); initBackButtonListener(); break;
+            case 'tensor-camera': await initTensorCamera(); initBackButtonListener(); break;
+            case 'tensor-image': await initTensorImage(); initBackButtonListener(); break;
+            case 'face-recognition': await initFaceRecognition(); initBackButtonListener(); break;
         }
     } catch (error) {
         console.error('Error loading view:', error);
-        const appContainer = document.getElementById('app-container');
-        appContainer.innerHTML = `
-            <div class="flex items-center justify-center min-h-screen">
-                <div class="text-center">
-                    <h2 class="text-2xl font-bold text-red-400 mb-4">Error Memuat Halaman</h2>
-                    <p class="text-slate-400">Gagal memuat ${viewName}.html</p>
-                    <button onclick="loadView('tool-selection')" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg">
-                        Kembali ke Menu Utama
-                    </button>
-                </div>
-            </div>
-        `;
     }
 }
 
 function initToolSelectionListeners() {
-    const tools = {
+    const standardTools = {
         'select-ai-chat': 'ai-chat',
         'select-tiktok-dl': 'tiktok-downloader',
         'select-num-converter': 'number-converter',
         'select-pw-generator': 'password-generator',
         'select-pdf-merger': 'pdf-merger',
-        'select-tensor-ai': 'tensor-chooser',
         'select-qrcode-generator': 'qrcode-generator',
         'select-diagram-editor': 'diagram-editor',
-        'select-text-extractor': 'text-extractor', 
+        'select-text-extractor': 'text-extractor',
+    };
+
+    Object.entries(standardTools).forEach(([id, view]) => {
+        document.getElementById(id)?.addEventListener('click', () => loadView(view));
+    });
+
+    // --- LOGIKA DIPERBAIKI DI SINI ---
+    const conflictingAiTools = {
+        'select-tensor-ai': 'tensor-chooser',
         'select-face-recognition': 'face-recognition'
     };
 
-    Object.entries(tools).forEach(([id, view]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('click', () => loadView(view));
-        } else {
-            console.warn(`Element dengan id ${id} tidak ditemukan`);
-        }
-    });
-}
-
-// FUNGSI BARU UNTUK MENGHANDLE HALAMAN PILIHAN TENSOR
-function initTensorChooserListeners() {
-    const cameraMode = document.getElementById('select-camera-mode');
-    const imageMode = document.getElementById('select-image-mode');
-    
-    if (cameraMode) {
-        cameraMode.addEventListener('click', () => loadView('tensor-camera'));
-    } else {
-        console.warn('Element select-camera-mode tidak ditemukan');
-    }
-    
-    if (imageMode) {
-        imageMode.addEventListener('click', () => loadView('tensor-image'));
-    } else {
-        console.warn('Element select-image-mode tidak ditemukan');
-    }
-}
-
-function initBackButtonListener() {
-    // Attach listener to any back button used across views (selection and chooser)
-    const backButtons = document.querySelectorAll('.back-to-selection-btn, .back-to-chooser-btn');
-    backButtons.forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            event.preventDefault();
-            // Stop camera stream if running
-            if (typeof window.stopTensorCameraStream === 'function') {
-                window.stopTensorCameraStream();
-            }
-            loadView('tool-selection');
+    Object.entries(conflictingAiTools).forEach(([id, view]) => {
+        document.getElementById(id)?.addEventListener('click', () => {
+            // Langsung set hash DAN reload pada klik pertama
+            window.location.hash = view;
+            window.location.reload();
         });
     });
 }
 
-// Tambahkan fungsi global untuk error handling
-window.handleGlobalError = function(error) {
-    console.error('Global error:', error);
-    // Bisa ditambahkan notifikasi error ke user di sini
-};
+function initTensorChooserListeners() {
+    document.getElementById('select-camera-mode')?.addEventListener('click', () => loadView('tensor-camera'));
+    document.getElementById('select-image-mode')?.addEventListener('click', () => loadView('tensor-image'));
+}
 
-// Global error handler
-window.addEventListener('error', (event) => {
-    handleGlobalError(event.error);
-});
+function initBackButtonListener() {
+    document.querySelectorAll('.back-to-selection-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            // Kembali ke menu utama dengan membersihkan hash dan reload
+            window.location.href = window.location.pathname;
+        });
+    });
 
-window.addEventListener('unhandledrejection', (event) => {
-    handleGlobalError(event.reason);
-});
+    document.querySelectorAll('.back-to-chooser-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            loadView('tensor-chooser'); // Kembali ke halaman pilihan tensor (tanpa reload)
+        });
+    });
+}
+
+// Fungsi loadScript (jika Anda masih menggunakannya di file lain)
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Gagal memuat script: ${src}`));
+        document.head.appendChild(script);
+    });
+}

@@ -1,4 +1,7 @@
-function initTensorImage() {
+async function initTensorImage() {
+    // Muat script yang dibutuhkan secara dinamis
+    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
+    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd');
     let model = null;
     let lastPreds = [];
 

@@ -1,4 +1,8 @@
-function initTensorCamera() {
+async function initTensorCamera() {
+    // Muat script yang dibutuhkan secara dinamis
+    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
+    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd');
+    
     const video = document.getElementById('cameraFeed');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');

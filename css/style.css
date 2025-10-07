@@ -228,3 +228,5 @@ input:checked + .slider:before { transform: translateX(16px); }
 #face-rec-view .threshold-control input[type="range"] { width: 100%; cursor: pointer; }
 #face-rec-view #known-faces-list { list-style-type: none; padding: 0; margin-top: 15px; }
 #face-rec-view #known-faces-list li { background-color: #1e293b; color: #cbd5e1; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; font-size: 14px; }
+/* pastikan loader tersembunyi secara default; hanya tampil saat JS men-set display */
+#face-rec-view #loader { display: none; margin: 12px auto; }

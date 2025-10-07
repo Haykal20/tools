@@ -1,5 +1,6 @@
-function initTextExtractor() {
-    // Cek jika library Tesseract ada
+async function initTextExtractor() {
+    // Muat script yang dibutuhkan secara dinamis
+    await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js');
     if (typeof Tesseract === 'undefined') {
         console.error("Library Tesseract.js tidak dimuat!");
         document.getElementById('progressStatus').textContent = "Error: Library Tesseract gagal dimuat.";
