@@ -100,7 +100,7 @@ function initToolSelectionListeners() {
         'select-tensor-ai': 'tensor-chooser',
         'select-qrcode-generator': 'qrcode-generator',
         'select-diagram-editor': 'diagram-editor',
-        'select-text-extractor': 'text-extractor'
+        'select-text-extractor': 'text-extractor', 
         'select-face-recognition': 'face-recognition'
     };
 
