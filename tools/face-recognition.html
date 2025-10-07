@@ -1,0 +1,72 @@
+<div id="face-rec-view" class="min-h-screen tool-body p-4 flex justify-center">
+    <div class="w-full max-w-xl mx-auto">
+        <button class="back-to-selection-btn mb-4 flex items-center gap-2 text-slate-300 hover:text-white transition">
+           <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Menu
+       </button>
+       <div class="tool-card rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 bg-gradient-to-r from-blue-500 to-sky-600 text-white text-center">
+               <div class="flex items-center justify-center gap-3 mb-2">
+                    <i data-lucide="scan-face" class="w-7 h-7"></i>
+                    <h1 class="text-3xl font-bold">Pengenalan Wajah</h1>
+                </div>
+               <p class="text-blue-100">Daftarkan dan verifikasi wajah menggunakan AI.</p>
+            </div>
+
+            <div class="p-6">
+                <div id="loader" class="loader"></div>
+                <div id="initial-info" class="face-rec-result info" style="display: block;">Memuat model AI...</div>
+
+                <div class="face-rec-card">
+                    <h2><span class="step-number">1</span> Buat File Wajah</h2>
+                    <p>Ubah foto dan nama menjadi file data (.json) untuk didaftarkan nanti.</p>
+                    <input type="text" id="personName" placeholder="Masukkan Nama di Sini">
+                    <div class="upload-area">
+                        <img id="registerPreview" class="image-preview" alt="Register Preview"/>
+                        <label for="registerFile" class="face-rec-btn">
+                            <i data-lucide="upload"></i><span>Pilih Gambar</span>
+                        </label>
+                        <input type="file" id="registerFile" accept="image/*">
+                    </div>
+                    <button onclick="downloadJSON()" id="downloadBtn" class="face-rec-btn mt-4" disabled>
+                        <i data-lucide="download"></i><span>Unduh File Wajah</span>
+                    </button>
+                    <div id="registerResult" class="face-rec-result"></div>
+                </div>
+
+                <div class="face-rec-card">
+                    <h2><span class="step-number">2</span> Database & Verifikasi</h2>
+                    <p>Tambah file .json wajah ke database browser.</p>
+                    <div class="button-group">
+                        <label for="jsonFile" class="face-rec-btn">
+                            <i data-lucide="plus"></i><span>Tambah Wajah</span>
+                        </label>
+                        <input type="file" id="jsonFile" accept=".json">
+                        <button class="face-rec-btn danger" onclick="clearDatabase()">
+                            <i data-lucide="trash-2"></i><span>Hapus Database</span>
+                        </button>
+                    </div>
+                    <div id="database-info">
+                        <p style="text-align:center; margin-top:15px;"><strong>Wajah Terdaftar:</strong></p>
+                        <ul id="known-faces-list"><li>Database kosong.</li></ul>
+                    </div>
+                    <hr style="border-color: #334155; margin: 20px 0;">
+                    <div class="button-group">
+                        <label for="verifyFile" class="face-rec-btn">
+                            <i data-lucide="user-check"></i><span>Verifikasi Gambar</span>
+                        </label>
+                        <input type="file" id="verifyFile" accept="image/*">
+                    </div>
+                    <div class="threshold-control">
+                        <label for="threshold">Ambang Batas Akurasi: <span id="thresholdValue">0.50</span></label>
+                        <input type="range" id="threshold" min="0.3" max="0.6" value="0.5" step="0.01">
+                        <p style="font-size: 12px; text-align: center; margin-top: 5px;">(Makin kecil nilai, makin akurat)</p>
+                    </div>
+                    <div class="upload-area" style="margin-top: 15px; padding:10px;">
+                        <img id="verifyPreview" class="image-preview" alt="Verify Preview"/>
+                    </div>
+                    <div id="verifyResult" class="face-rec-result"></div>
+                </div>
+            </div>
+       </div>
+   </div>
+</div>
