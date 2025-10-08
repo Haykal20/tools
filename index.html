@@ -9,6 +9,11 @@
     
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- PWA: manifest + theme + apple icon -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0ea5a4">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/0ea5a4/ffffff?text=H">
+
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,6 +46,15 @@
     <script src="js/diagram-editor.js"></script>
     <script src="js/text-extractor.js"></script>
     <script src="js/face-recognition.js"></script>
+
+    <!-- PWA: register service worker (relative path) -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('js/sw.js')
+        .then(reg => console.log('SW terdaftar:', reg.scope))
+        .catch(err => console.warn('Gagal daftar SW:', err));
+    }
+    </script>
 </body>
 </html>
 
