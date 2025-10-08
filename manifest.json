@@ -1,6 +1,6 @@
 {
   "name": "Haykalf.s Tools",
-  "short_name": "Haykalf Tools",
+  "short_name": "Tools",
   "description": "Kumpulan tools Haykalf.s — installer friendly PWA",
   "start_url": "/",
   "display": "standalone",
